@@ -96,4 +96,4 @@ npm run dev
 
 ## 📞 联系方式
 
-- 项目链接: [https://github.com/natsumezjr/cloudControl-nexus](https://github.com/natsumezjr/cloudControl-nexus) 
+- 项目链接: [https://github.com/natsumezjr/cloudControl-nexus](https://github.com/natsumezjr/cloudControl-nexus)
