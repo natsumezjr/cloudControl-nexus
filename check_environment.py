@@ -189,6 +189,7 @@ def check_ide_tools():
     
     return True
 
+
 def main():
     """主函数"""
     print("CloudControl-Nexus 开发环境检查")

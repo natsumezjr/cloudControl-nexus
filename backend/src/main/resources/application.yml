@@ -6,9 +6,9 @@
 server:
   port: 8080  # 应用端口号 - 访问地址: http://localhost:8080
   servlet:
-    context-path: /api  # API路径前缀 - 完整地址: http://localhost:8080/api
+    context-path: /  # API路径前缀 - 完整地址: http://localhost:8080/
     # 注意: Controller中@RequestMapping不要写/api，会自动加上
-    # 前端调用时也不需要手动添加/api前缀
+    # 前端调用时也不需要手动添加/前缀
     session:
       timeout: 30m  # 会话超时时间 - 30分钟无操作自动失效，Spring Boot自动管理
   compression:
@@ -22,7 +22,7 @@ spring:
   # ==================== 数据源配置 ====================
   datasource:
     # PostgreSQL数据库配置
-    url: jdbc:postgresql://localhost:5432/cloudcontrol_dev  # 数据库连接URL
+    url: jdbc:postgresql://localhost:5432/cloudcontrol_test  # 数据库连接URL
     # URL格式: jdbc:postgresql://主机:端口/数据库名，需要提前创建数据库。
     # localhost=数据库服务器地址, 5432=PostgreSQL端口, cloudcontrol_dev=数据库名
     username: postgres  # 数据库用户名，是数据库的超级用户
@@ -42,7 +42,7 @@ spring:
   # ==================== JPA配置 ====================
   jpa:
     hibernate:
-      ddl-auto: update  # 开发环境：自动更新表结构(create, create-drop, update, validate, none)
+      ddl-auto: validate  # 使用Flyway后改为validate，让Flyway管理表结构
     show-sql: true  # 在控制台显示SQL语句
     properties:
       hibernate:
@@ -51,6 +51,16 @@ spring:
         jdbc:
           time_zone: Asia/Shanghai  # 时区设置
     open-in-view: false  # 性能优化：关闭OSIV(Open Session In View)
+  
+  # ==================== Flyway数据库迁移配置 ====================
+  flyway:
+    enabled: true  # 启用Flyway
+    locations: classpath:db/migration  # 迁移脚本位置
+    baseline-on-migrate: true  # 在非空数据库上执行迁移时自动基线
+    validate-on-migrate: true  # 迁移前验证脚本
+    clean-disabled: true  # 禁用clean命令（生产环境安全）
+    out-of-order: false  # 按顺序执行迁移
+    table: flyway_schema_history  # 版本控制表名
   
   # ==================== Redis配置 ====================
   # Redis是一个独立的、支持高并发访问的内存数据库，可以被多台应用服务器同时访问。
@@ -237,7 +247,7 @@ spring:
   
   # 开发环境数据源配置
   datasource:
-    url: jdbc:postgresql://localhost:5432/cloudcontrol_dev  # 开发环境数据库
+    url: jdbc:postgresql://localhost:5432/cloudcontrol_test  # 开发环境数据库
     username: postgres
     password: password
   
