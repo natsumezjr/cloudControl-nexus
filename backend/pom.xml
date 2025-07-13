@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <!-- 项目基本信息 -->
+    <groupId>com.cloudcontrol</groupId>
+    <artifactId>cloud-control-nexus</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    
+    <name>Cloud Control Nexus</name>
+    <description>云平台控制系统 - 终端管理和指令下发平台</description>
+    
+    <!-- Spring Boot父项目 - 提供依赖管理和版本控制 -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    
+    <!-- 项目属性配置 -->
+    <properties>
+        <!-- Java版本配置 -->
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        
+        <!-- 项目编码配置 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
+        <!-- 依赖版本管理 -->
+        <jwt.version>0.11.5</jwt.version>
+        <springdoc.version>2.1.0</springdoc.version>
+    </properties>
+    
+    <!-- 项目依赖管理 -->
+    <dependencies>
+        
+        <!-- ==================== 核心Web框架 ==================== -->
+        <!-- Spring Boot Web Starter - 提供REST API支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <!-- 包含：Spring MVC, Tomcat, Jackson, 验证器等 -->
+        </dependency>
+        
+        <!-- ==================== 数据访问层 ==================== -->
+        <!-- Spring Boot Data JPA - 提供ORM和数据库操作支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <!-- 包含：Hibernate, JPA, 事务管理等 -->
+        </dependency>
+        
+        <!-- PostgreSQL数据库驱动 -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope> <!-- 运行时依赖，编译时不需要 -->
+        </dependency>
+        
+        <!-- Flyway数据库迁移工具 - 管理数据库版本 -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <!-- 自动执行SQL脚本，管理数据库结构变更 -->
+        </dependency>
+        
+        <!-- ==================== 缓存层 ==================== -->
+        <!-- Redis缓存支持 - 用户会话管理和终端状态缓存 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <!-- 包含：Redis连接池, RedisTemplate, 序列化器等 -->
+        </dependency>
+        
+        <!-- ==================== 安全认证层 ==================== -->
+        <!-- Spring Security - 提供认证授权功能 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <!-- 包含：认证, 授权, 密码加密, 会话管理等 -->
+        </dependency>
+        
+        <!-- JWT Token支持 - 无状态认证 -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.version}</version>
+            <!-- JWT Token生成和验证API -->
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+            <!-- JWT实现类，运行时加载 -->
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+            <!-- JWT Jackson序列化支持 -->
+        </dependency>
+        
+        <!-- ==================== 数据验证层 ==================== -->
+        <!-- 参数验证支持 - 请求参数校验 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <!-- 包含：@Valid, @NotNull, @Size等验证注解 -->
+        </dependency>
+        
+        <!-- ==================== API文档层 ==================== -->
+        <!-- OpenAPI 3.0文档支持 - 自动生成API文档 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+            <!-- 自动生成Swagger UI文档，支持在线测试 -->
+        </dependency>
+        
+        <!-- ==================== 监控运维层 ==================== -->
+        <!-- Spring Boot Actuator - 应用监控和健康检查 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <!-- 提供：健康检查, 指标监控, 环境信息等端点 -->
+        </dependency>
+        
+        <!-- ==================== 日志层 ==================== -->
+        <!-- 日志支持 - 应用日志记录 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+            <!-- 包含：Logback, 日志配置, 日志级别控制 -->
+        </dependency>
+        
+        <!-- ==================== 测试层 ==================== -->
+        <!-- 测试依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- H2内存数据库 - 用于测试 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Spring Security测试支持 -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+    </dependencies>
+    
+    <!-- ==================== 构建配置 ==================== -->
+    <build>
+        <plugins>
+            <!-- Spring Boot Maven插件 - 打包可执行JAR -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 排除开发工具，生产环境不需要 -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-devtools</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            
+            <!-- Maven编译插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            
+            <!-- Maven资源插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <!-- ==================== 依赖管理 ==================== -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- 统一管理依赖版本 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${project.parent.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+</project>

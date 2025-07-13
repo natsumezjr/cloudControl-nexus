@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 开发环境检查脚本
-检查Java、Node.js、PostgreSQL等开发环境是否正确安装
+检查Java、Node.js、PostgreSQL、Redis等开发环境是否正确安装
 """
 
 import subprocess
@@ -100,7 +100,47 @@ def check_postgresql():
     else:
         print("⚠️ PostgreSQL服务可能未运行，请手动检查")
     
+    # 检查数据库连接
+    print("\n📋 PostgreSQL配置说明:")
+    print("1. 数据库名称: cloudcontrol_dev")
+    print("2. 用户名: postgres")
+    print("3. 密码: bupt_test (在application.yml中配置)")
+    print("4. 端口: 5432")
+    print("5. 创建数据库命令: CREATE DATABASE cloudcontrol_dev;")
+    print("6. 修改密码命令: ALTER USER postgres PASSWORD 'your_password';")
+    print("7. 配置文件位置: backend/src/main/resources/application.yml")
+    print("8. 连接测试: psql -U postgres -h localhost -d cloudcontrol_dev")
+    
     return True
+
+def check_redis():
+    """检查Redis环境"""
+    print("=" * 50)
+    print("检查Redis环境...")
+    
+    # 检查Docker是否运行
+    success, output, error = run_command("docker info")
+    if not success:
+        print("❌ Docker未运行，无法检查Redis")
+        return False
+    
+    # 检查Redis容器是否运行
+    success, output, error = run_command("docker ps --filter name=redis-cloudcontrol --format '{{.Names}}'")
+    if success and "redis-cloudcontrol" in output:
+        print("✅ Redis容器正在运行")
+        
+        # 检查Redis端口是否可访问
+        success, output, error = run_command("docker exec redis-cloudcontrol redis-cli ping")
+        if success and "PONG" in output:
+            print("✅ Redis服务响应正常")
+            return True
+        else:
+            print("❌ Redis服务无响应")
+            return False
+    else:
+        print("❌ Redis容器未运行")
+        print("💡 启动Redis容器命令: docker run -d --name redis-cloudcontrol -p 6379:6379 redis:latest")
+        return False
 
 def check_docker():
     """检查Docker环境"""
@@ -157,6 +197,7 @@ def main():
     java_ok = check_java()
     nodejs_ok = check_nodejs()
     postgresql_ok = check_postgresql()
+    redis_ok = check_redis()
     docker_ok = check_docker()
     ide_ok = check_ide_tools()
     
@@ -165,10 +206,21 @@ def main():
     print(f"Java环境: {'✅ 正常' if java_ok else '❌ 需要安装'}")
     print(f"Node.js环境: {'✅ 正常' if nodejs_ok else '❌ 需要安装'}")
     print(f"PostgreSQL环境: {'✅ 正常' if postgresql_ok else '❌ 需要安装'}")
+    print(f"Redis环境: {'✅ 正常' if redis_ok else '❌ 需要启动'}")
     print(f"Docker环境: {'✅ 正常' if docker_ok else '❌ 需要安装'}")
     print(f"开发工具: {'✅ 正常' if ide_ok else '⚠️ 建议安装'}")
     
-    if all([java_ok, nodejs_ok, postgresql_ok, docker_ok]):
+    print("\n" + "=" * 50)
+    print("Redis配置说明:")
+    print("1. Redis服务通过Docker容器运行")
+    print("2. 容器名称: redis-cloudcontrol")
+    print("3. 端口映射: 6379:6379")
+    print("4. 启动命令: docker run -d --name redis-cloudcontrol -p 6379:6379 redis:latest")
+    print("5. 停止命令: docker stop redis-cloudcontrol")
+    print("6. 删除容器: docker rm redis-cloudcontrol")
+    print("7. 查看日志: docker logs redis-cloudcontrol")
+    
+    if all([java_ok, nodejs_ok, postgresql_ok, redis_ok, docker_ok]):
         print("\n🎉 所有必需环境都已正确安装！可以开始开发了。")
     else:
         print("\n⚠️ 请先安装缺失的开发环境，然后重新运行此脚本。")

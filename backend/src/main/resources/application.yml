@@ -1,0 +1,300 @@
+# 云平台控制系统 - 开发环境配置
+# 文件名: application.yml
+# 位置: src/main/resources/application.yml
+
+# ==================== 服务器配置 ====================
+server:
+  port: 8080  # 应用端口号 - 访问地址: http://localhost:8080
+  servlet:
+    context-path: /api  # API路径前缀 - 完整地址: http://localhost:8080/api
+    # 注意: Controller中@RequestMapping不要写/api，会自动加上
+    # 前端调用时也不需要手动添加/api前缀
+    session:
+      timeout: 30m  # 会话超时时间 - 30分钟无操作自动失效，Spring Boot自动管理
+  compression:
+    enabled: true  # 启用响应压缩 - 减少网络传输数据量
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json  # 需要压缩的文件类型
+    min-response-size: 1024  # 最小压缩大小 - 只有大于1KB的响应才会被压缩
+
+# ==================== Spring配置 ====================
+spring:
+  
+  # ==================== 数据源配置 ====================
+  datasource:
+    # PostgreSQL数据库配置
+    url: jdbc:postgresql://localhost:5432/cloudcontrol_dev  # 数据库连接URL
+    # URL格式: jdbc:postgresql://主机:端口/数据库名，需要提前创建数据库。
+    # localhost=数据库服务器地址, 5432=PostgreSQL端口, cloudcontrol_dev=数据库名
+    username: postgres  # 数据库用户名，是数据库的超级用户
+    password: bupt_test  # 数据库密码，通常是下载数据库时设置的密码
+    driver-class-name: org.postgresql.Driver  # PostgreSQL驱动类
+    # 驱动已在pom.xml中配置: <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId></dependency>
+    
+    # HikariCP连接池配置
+    hikari:
+      maximum-pool-size: 20  # 最大连接池大小（最多允许20个并发数据库连接）
+      minimum-idle: 5  # 最小空闲连接数（最少保持5个空闲连接）
+      connection-timeout: 30000  # 获取连接的超时时间（毫秒），超过这个时间抛出异常
+      idle-timeout: 600000  # 空闲连接超时时间(毫秒)，超过这个时间连接被释放
+      max-lifetime: 1800000  # 连接最大生命周期(毫秒)，超过这个时间连接被释放
+      leak-detection-threshold: 60000  # 连接泄漏检测阈值(毫秒)，超过这个时间抛出异常
+  
+  # ==================== JPA配置 ====================
+  jpa:
+    hibernate:
+      ddl-auto: update  # 开发环境：自动更新表结构(create, create-drop, update, validate, none)
+    show-sql: true  # 在控制台显示SQL语句
+    properties:
+      hibernate:
+        format_sql: true  # 格式化SQL输出
+        dialect: org.hibernate.dialect.PostgreSQLDialect  # PostgreSQL方言
+        jdbc:
+          time_zone: Asia/Shanghai  # 时区设置
+    open-in-view: false  # 性能优化：关闭OSIV(Open Session In View)
+  
+  # ==================== Redis配置 ====================
+  # Redis是一个独立的、支持高并发访问的内存数据库，可以被多台应用服务器同时访问。
+  # 单独部署一台或多台Redis服务器（可以是物理机、虚拟机、云主机等）。
+  # 所有分布式应用节点（无论有多少台）都通过网络访问同一个Redis服务。
+  # 需要自己进行维护。
+  redis:
+    host: localhost  # Redis服务器地址
+    port: 6379  # Redis端口
+    password:  # Redis密码(如果有)，开发环境一般没有密码，生产环境需要设置密码，在redis.conf中设置。
+    database: 0  # Redis数据库编号
+    timeout: 2000ms  # 连接超时时间
+    lettuce:  # Lettuce连接池配置
+      pool:
+        max-active: 8  # 最大活跃连接数
+        max-wait: -1ms  # 最大等待时间
+        max-idle: 8  # 最大空闲连接数
+        min-idle: 0  # 最小空闲连接数
+  
+  # ==================== 安全配置 ====================
+  security:
+    user:
+      name: admin  # 默认管理员用户名
+      password: admin123  # 默认管理员密码
+    # JWT配置
+    # 生成、解析、验证JWT的密钥，需要保密，不要泄露。
+    # 内存存储由Redis管理。
+    jwt:
+      secret: cloudcontrol-nexus-jwt-secret-key-2024  # JWT密钥
+      expiration: 86400000  # Token过期时间(24小时)
+      refresh-expiration: 604800000  # 刷新Token过期时间(7天)
+  
+  # ==================== 文件上传配置 ====================
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 单个文件最大大小，超过这个大小会抛出异常
+      max-request-size: 10MB  # 请求最大大小，超过这个大小会抛出异常
+      # 这里默认为表单、图片等小文件上传。
+      # 如果设计压缩包等大文件上传，需要设置更大的值。
+      enabled: true  # 启用文件上传，如果不需要文件上传，可以关闭
+  
+  # ==================== 缓存配置 ====================
+  # 配置 spring.cache.type=redis 后，Spring Boot会自动使用Redis作为缓存。
+  cache:
+    type: redis  # 缓存类型，使用Redis作为缓存
+    redis:
+      time-to-live: 3600000  # 缓存过期时间(1小时)
+      cache-null-values: false  # 是否缓存空值
+  
+  # ==================== 任务调度配置 ====================
+  task:
+  # 这里可以管理 http 轮询、定时任务等。
+    execution:
+      pool:
+        core-size: 8  # 核心线程数，线程池中始终保留的线程数量，即使它们处于空闲状态也不会被回收。
+        # 推荐设置为CPU核心数或略大于CPU核心数。
+        max-size: 16  # 最大线程数，线程池中最多可以创建的线程数量。
+        # 推荐为核心线程数的2~4倍，用于应对突发高并发。
+        queue-capacity: 100  # 队列容量，当线程池中的线程数达到核心线程数时，新任务会进入队列等待。
+        keep-alive: 60s  # 线程保活时间，非核心线程在空闲时间超过这个时间后会被回收，可以用于心跳检测。
+
+  # ==================== 会话配置 ====================
+  session:
+    store-type: redis  # 会话存储类型，使用Redis作为会话存储，自动实现，无需调用任何方法。
+    redis:
+      time-to-live: 3600000  # 会话过期时间(1小时)
+      max-inactive-interval: 3600000  # 会话最大不活动时间(1小时)
+      redis-namespace: session  # Redis命名空间
+
+# ==================== 日志配置 ====================
+logging:
+  level:
+    com.cloudcontrol: DEBUG  # 应用包日志级别
+    org.springframework.security: DEBUG  # 安全框架日志级别
+    org.springframework.web: DEBUG  # Web框架日志级别
+    org.hibernate.SQL: DEBUG  # SQL语句日志
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # SQL参数日志
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  # 控制台日志格式
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  # 文件日志格式
+  file:
+    name: logs/cloudcontrol.log  # 日志文件路径
+    max-size: 100MB  # 单个日志文件最大大小
+    max-history: 30  # 保留日志文件数量
+
+# ==================== 监控配置 ====================
+# 后期开发优化
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops  # 暴露的监控端点
+      base-path: /actuator  # 监控端点基础路径
+  endpoint:
+    health:
+      show-details: always  # 显示健康检查详细信息
+      show-components: always  # 显示组件健康状态
+    info:
+      enabled: true  # 启用信息端点
+  info:
+    env:
+      enabled: true  # 启用环境信息
+    git:
+      mode: full  # Git信息模式
+
+# ==================== API文档配置 ====================
+springdoc:
+  api-docs:
+    path: /api-docs  # API文档路径，访问地址: http://localhost:8080/api/api-docs，供前端调用。
+  swagger-ui:
+  # Swagger UI 是一个自动生成的、可视化的API文档页面。
+    path: /swagger-ui.html  # Swagger UI路径
+    # 访问地址: http://localhost:8080/api/swagger-ui.html，可以看到所有后端API的文档。
+    # 你可以直接在页面上填写参数，点击“Try it out”按钮，无需写前端代码或用Postman，就能发起真实的HTTP请求，看到后端返回的结果。
+    tags-sorter: alpha  # 标签排序
+    operations-sorter: alpha  # 操作排序
+    # 排序方式：alpha 按字母顺序排序，method 按方法名排序，none 不排序。
+  info:
+  #设置API文档页面顶部显示的项目信息（标题、描述、版本、联系人等）。
+    title: 云平台控制系统 API  # API文档标题
+    description: 云平台控制系统 REST API 文档  # API文档描述
+    version: 1.0.0  # API版本
+    contact:
+      name: CloudControl Team  # 开发团队
+      email: support@cloudcontrol.com  # 开发团队邮箱
+  servers:
+    - url: http://localhost:8080/api  # 服务器URL
+      description: 开发环境  # 环境描述
+
+# ==================== 自定义配置 ====================
+# 可以通过 cloudcontrol.xxx来访问。
+# @Value("${cloudcontrol.terminal.heartbeat-interval}")
+# private Long heartbeatInterval;
+# @Component
+# @ConfigurationProperties(prefix = "cloudcontrol.terminal")
+# public class TerminalProperties {
+#     private Long heartbeatInterval;
+#     private Long offlineTimeout;
+#     private Integer maxCommandRetry; // 前三个顺着 terminal 的配置
+# }
+cloudcontrol:
+  # 应用信息
+  app:
+    name: CloudControl Nexus  # 应用名称
+    version: 1.0.0  # 应用版本
+    description: 云平台控制系统  # 应用描述
+  
+  # 终端配置
+  terminal:
+    heartbeat-interval: 30000  # 心跳间隔(30秒)
+    offline-timeout: 60000  # 离线超时时间(60秒)
+    max-command-retry: 3  # 指令最大重试次数
+  
+  # 文件存储配置
+  storage:
+    type: local  # 决定了上传的文件存储在哪里（local 是本地存储，s3 是亚马逊云存储，oss 是阿里云存储）
+    local:
+      path: ./uploads  # 本地存储路径，一般而言在backend目录下运行java，上传到backend/uploads目录下。
+      max-size: 100MB  # 最大文件大小
+    s3:
+    # 如果使用 s3 存储，需要配置以下信息。
+      bucket: cloudcontrol-files  # S3存储桶
+      region: us-east-1  # S3区域
+  
+  # 通知配置
+  notification:
+    # 邮件通知开关（如：用户注册、密码找回、任务完成等），如果需要邮件通知，需要配置以下信息。
+    email:
+      enabled: false  # 邮件通知开关
+      smtp-host: smtp.gmail.com  # SMTP服务器
+      smtp-port: 587  # SMTP端口
+    webhook:
+    # 当你系统内发生某个事件（如终端上线），就会自动向url指定的地址发一个HTTP请求（通常是POST），把事件内容推送过去。
+      enabled: false  # Webhook通知开关
+      url: http://localhost:8080/webhook  # Webhook URL
+
+# ==================== 开发环境特定配置 ====================
+---
+spring:
+  config:
+    activate:
+      on-profile: dev  # 激活开发环境配置
+      # 命令行运行 java -jar my_app.jar --spring.profiles.active=dev
+  
+  # 开发环境数据源配置
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cloudcontrol_dev  # 开发环境数据库
+    username: postgres
+    password: password
+  
+  # 开发环境日志配置
+  logging:
+    level:
+      root: INFO  # 根日志级别
+      com.cloudcontrol: DEBUG  # 应用日志级别
+      org.springframework.web: DEBUG  # Web日志级别
+  
+  # 开发环境安全配置
+  security:
+    user:
+      name: dev  # 开发环境用户名
+      password: dev123  # 开发环境密码
+
+# ==================== 生产环境特定配置 ====================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod  # 激活生产环境配置
+  
+  # 生产环境数据源配置
+  datasource:
+    url: jdbc:postgresql://prod-db:5432/cloudcontrol_prod  # 生产环境数据库
+    username: ${DB_USERNAME}  # 环境变量用户名
+    password: ${DB_PASSWORD}  # 环境变量密码
+  
+  # 生产环境日志配置
+  logging:
+    level:
+      root: WARN  # 生产环境日志级别
+      com.cloudcontrol: INFO  # 应用日志级别
+  
+  # 生产环境安全配置
+  security:
+    user:
+      name: ${ADMIN_USERNAME}  # 环境变量管理员用户名
+      password: ${ADMIN_PASSWORD}  # 环境变量管理员密码
+
+# ==================== 测试环境特定配置 ====================
+---
+spring:
+  config:
+    activate:
+      on-profile: test  # 激活测试环境配置
+  
+  # 测试环境数据源配置
+  datasource:
+    url: jdbc:h2:mem:testdb  # H2内存数据库
+    driver-class-name: org.h2.Driver  # H2驱动
+    username: sa  # H2默认用户名
+    password:  # H2默认密码
+  
+  # 测试环境日志配置
+  logging:
+    level:
+      root: WARN  # 测试环境日志级别
+      com.cloudcontrol: DEBUG  # 应用调试日志
