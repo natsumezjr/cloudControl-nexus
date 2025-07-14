@@ -139,6 +139,106 @@ mvn test -Dspring.profiles.active=dev
 2. 确保外部服务运行
 3. 使用 `-Dspring.profiles.active=dev` 激活配置
 
+## 新增：Spring Boot集成测试数据库问题
+
+### 问题现象
+- 使用 @DataJpaTest 进行集成测试时，Spring Boot 默认会尝试用内存数据库（如H2、HSQL、Derby）替换真实数据库。
+- 如果项目未引入内存数据库依赖，或需要直接用 cloudcontrol_test 真实数据库，会导致如下报错：
+
+```
+Failed to replace DataSource with an embedded database for tests. If you want an embedded database please put a supported one on the classpath or tune the replace attribute of @AutoConfigureTestDatabase.
+```
+
+### 解决方案（最佳实践，参考user模块）
+- 在测试类上加注解：
+
+```java
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:postgresql://localhost:5432/cloudcontrol_test",
+    "spring.datasource.username=postgres",
+    "spring.datasource.password=bupt_test",
+    "spring.jpa.hibernate.ddl-auto=validate",
+    "spring.flyway.enabled=true"
+})
+```
+- 这样可强制Spring Boot测试用真实数据库（如cloudcontrol_test），避免自动替换为内存数据库，并确保所有关键参数不会被其它配置覆盖。
+- 配合脚本自动切换 application.yml，确保测试环境一致。
+
+---
+
+## 终端状态上报模块设计与迁移注意事项（2024-07-14更新）
+
+### 1. 设计思路
+
+- 终端状态上报涉及大量动态、嵌套的字典型数据（如 powerstatus、info、terminal 等），每个字段内部结构复杂且随设备升级可能扩展。
+- 传统的 jsonb/text 方案虽然灵活，但不利于后期查询、统计、维护和系统化管理。
+- 采用“标准化字段表”方案，将所有上报的嵌套字段拆解为扁平化的 path/value 结构，便于扩展、查询和统计。
+
+### 2. 方案结构
+
+#### 主表
+```sql
+CREATE TABLE terminal_status_report (
+    id BIGSERIAL PRIMARY KEY,
+    terminal_id VARCHAR(64),
+    report_time TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### 字段表
+```sql
+CREATE TABLE terminal_status_report_fields (
+    id BIGSERIAL PRIMARY KEY,
+    report_id BIGINT REFERENCES terminal_status_report(id),
+    field_name VARCHAR(100),      -- 一级字段名，如 'powerstatus'
+    field_path VARCHAR(200),      -- 完整路径，如 'powerstatus.battery'
+    field_value TEXT,             -- 具体值
+    field_type VARCHAR(20),       -- 'string', 'number', 'boolean', 'object'
+    UNIQUE(report_id, field_path)
+);
+CREATE INDEX idx_report_fields ON terminal_status_report_fields(report_id, field_name);
+CREATE INDEX idx_field_path ON terminal_status_report_fields(field_path, field_value);
+```
+
+### 3. 典型数据入库示例
+
+原始上报：
+```json
+{
+  "powerstatus": {"status": "on", "battery": 85, "ac_power": true},
+  "info": {"version": "1.2.3", "serial": "SN123456789"}
+}
+```
+入库拆解：
+| report_id | field_name  | field_path           | field_value   | field_type |
+|-----------|-------------|---------------------|--------------|------------|
+| 1         | powerstatus | powerstatus.status  | on           | string     |
+| 1         | powerstatus | powerstatus.battery | 85           | number     |
+| 1         | powerstatus | powerstatus.ac_power| true         | boolean    |
+| 1         | info        | info.version        | 1.2.3        | string     |
+| 1         | info        | info.serial         | SN123456789  | string     |
+
+### 4. 查询与维护优势
+- 可对任意子字段高效查询、统计、分组
+- 新增字段无需改表结构，直接插入新 path
+- 便于数据治理、权限控制、数据分析
+- 维护简单，结构清晰
+
+### 5. 迁移注意事项
+- 删除原有的 jsonb/text 方案相关表、实体、DTO、Repository、测试类
+- 新建标准化主表和字段表，严格按上述结构迁移
+- 所有上报数据入库前需递归拆解为 path/value 结构
+- 迁移脚本需保证外键、索引完整
+- 相关文档、API、测试脚本需同步更新
+
+### 6. 今日对话要点总结
+- 详细分析了 jsonb/text 方案的局限性
+- 结合系统化、可扩展、易维护的需求，提出标准化字段表方案
+- 给出完整表结构、数据入库、查询、维护的最佳实践
+- 明确所有原有终端上报相关文件全部删除，统一采用新方案
+
 ### 6. 测试策略
 
 #### 简化测试（推荐）
