@@ -262,3 +262,6 @@ Repository → Service → Controller
    - 建立知识库
    - 完善经验总结
    - 建立最佳实践库 
+
+- `docs/api/terminal_websocket_command_test.md`：WebSocket指令下发与测试说明，包含接口、流程、示例。
+- `docs/api/command_terminal_api.md`：终端指令下发与管理API，含WebSocket与HTTP两种下发方式。 

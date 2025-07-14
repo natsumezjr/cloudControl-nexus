@@ -45,6 +45,7 @@ CloudControl-Nexus/
 - PostgreSQL 14+
 - Docker Desktop
 - Git
+- Redis
 
 ## 🚀 快速开始
 
@@ -82,18 +83,25 @@ npm run dev
 - [Django到Spring Boot迁移指南](./docs/django_to_springboot_migration.md)
 - [Spring Boot分层架构详解](./docs/springboot_layered_architecture.md)
 
-## 🤝 贡献
+## 📚 重要文档索引
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开 Pull Request
+本项目所有详细文档均位于 `docs/` 目录，核心文档及作用如下：
 
-## 📄 许可证
+- `docs/documentation_overview.md`：文档体系总览，分类导航入口。
+- `docs/development/project_structure_guide.md`：项目结构说明，后端/前端/基础设施/文档分层与职责。
+- `docs/architecture/architecture_decision_record.md`：架构决策记录，记录关键技术选型与变更原因。
+- `docs/architecture/springboot_layered_architecture.md`：Spring Boot分层架构设计与分工。
+- `docs/architecture/django_to_springboot_migration.md`：Django到Spring Boot迁移策略与经验。
+- `docs/database/database_migration_guide.md`：数据库迁移与环境配置说明。
+- `docs/database/cloud_platform_er_design.md`：云平台ER设计，数据库实体关系图。
+- `docs/api/command_terminal_api.md`：终端指令下发与管理API说明。
+- `docs/api/terminal_status_report_api.md`：终端状态上报API说明。
+- `docs/api/terminal_websocket_command_test.md`：WebSocket指令下发与测试说明。
+- `docs/api/terminal_polling_command_test.md`：轮询指令下发与测试说明。
+- `docs/development/development_continuity_guide.md`：开发连贯性与规范。
+- `docs/development/development_checklist.md`：开发自查清单。
+- `docs/records/ai_chat_history.md`：AI对话与决策历史。
+- `docs/environment_setup.md`：开发环境配置与依赖说明。
+- `docs/api/frontend_api_reference.md`：前端接口说明，涵盖主要API、参数、用途及与后端接口的关系。
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 📞 联系方式
-
-- 项目链接: [https://github.com/natsumezjr/cloudControl-nexus](https://github.com/natsumezjr/cloudControl-nexus)
+> 更多详细文档请参见 `docs/`

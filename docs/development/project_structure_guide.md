@@ -145,6 +145,19 @@ exception/
 └── ValidationException.java   # 验证异常类
 ```
 
+### WebSocket模块
+
+- 目录位置：`backend/src/main/java/com/cloudcontrol/websocket/`
+- 主要职责：
+  - 终端与服务端的实时通信（指令下发、心跳、状态回传等）
+  - 统一WebSocket连接管理、消息分发、会话维护
+  - 与Service、Repository等分层解耦，便于扩展和维护
+- 典型类：
+  - `WebSocketConfig.java`：WebSocket配置与端点注册
+  - `TerminalWebSocketHandler.java`：终端通信核心Handler
+
+> WebSocket模块与Controller、Service、Repository等分层协作，支持企业级实时通信需求。
+
 ## 前端详细结构
 
 ### 组件层 (Components)

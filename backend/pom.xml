@@ -46,6 +46,12 @@
             <!-- 包含：Spring MVC, Tomcat, Jackson, 验证器等 -->
         </dependency>
         
+        <!-- WebSocket支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        
         <!-- ==================== 数据访问层 ==================== -->
         <!-- Spring Boot Data JPA - 提供ORM和数据库操作支持 -->
         <dependency>

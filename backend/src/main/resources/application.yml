@@ -210,7 +210,7 @@ cloudcontrol:
   
   # 终端配置
   terminal:
-    heartbeat-interval: 30000  # 心跳间隔(30秒)
+    heartbeat-interval: 55000  # 心跳间隔(55秒)
     offline-timeout: 60000  # 离线超时时间(60秒)
     max-command-retry: 3  # 指令最大重试次数
   
