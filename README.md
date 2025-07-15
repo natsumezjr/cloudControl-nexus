@@ -77,6 +77,19 @@ npm install
 npm run dev
 ```
 
+## 启动后端服务器（开发环境）
+
+开发环境下，使用如下命令启动Spring Boot后端服务：
+
+```bash
+mvn -f backend/pom.xml spring-boot:run -Pdev
+```
+
+- `-f backend/pom.xml`：指定后端Maven项目路径
+- `-Pdev`：激活开发环境配置（application.yml、pom.xml、Spring配置等均会使用dev profile）
+
+如需切换到测试环境，使用 `-Ptest`，生产环境为 `-Pprod`。
+
 ## 📚 文档
 
 - [项目结构说明](./docs/project_structure.md)

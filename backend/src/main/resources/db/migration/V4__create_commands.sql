@@ -11,6 +11,6 @@ CREATE TABLE commands (
     status VARCHAR(255) NOT NULL,                       -- 指令状态（枚举字符串）
     created_at TIMESTAMP NOT NULL,                      -- 创建时间
     author BIGINT NOT NULL,                             -- 指令创建者ID，外键关联users表
-    FOREIGN KEY (post) REFERENCES terminals(id),         -- 外键约束：目标终端
+    FOREIGN KEY (post) REFERENCES terminals(serial_no),  -- 外键约束：目标终端
     FOREIGN KEY (author) REFERENCES users(id)            -- 外键约束：创建者
 ); 

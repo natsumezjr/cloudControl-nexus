@@ -224,4 +224,332 @@ result = subprocess.run(
 - 前后端指令下发、心跳、回执等流程全部基于WebSocket实现。
 - 便于后续横向扩展和新业务集成。
 
+---
+
+## ADR-003: Spring Security分环境配置决策
+
+### 状态
+**已采纳** - 2024年7月15日
+
+### 背景
+项目需要支持多环境部署（开发、测试、生产），不同环境对安全性的要求不同：
+1. 开发环境需要方便调试，允许访问Swagger UI和API文档
+2. 测试环境需要平衡安全性和便利性
+3. 生产环境需要严格的安全保护
+
+### 问题分析
+
+#### 1. 默认安全配置问题
+**问题描述**:
+- Spring Boot默认启用Spring Security
+- 默认配置保护所有端点，包括Swagger UI
+- 访问 `http://localhost:8080/swagger-ui.html` 被重定向到登录页面
+
+**根本原因**:
+- 缺乏环境特定的安全配置
+- 没有针对不同环境的差异化安全策略
+
+#### 2. 开发效率问题
+**问题描述**:
+- 开发人员无法直接访问API文档
+- 需要额外的认证步骤才能测试API
+- 影响开发效率和调试便利性
+
+#### 3. 安全风险问题
+**问题描述**:
+- 生产环境需要严格的安全保护
+- 需要防止CSRF攻击、XSS攻击等
+- 需要适当的会话管理和认证机制
+
+### 解决方案
+
+#### 1. 分环境安全配置架构
+**决策**: 采用基于Spring Profile的分环境安全配置
+
+**实现方案**:
+```java
+// 开发环境配置
+@Configuration
+@EnableWebSecurity
+@Profile("dev")
+public class DevSecurityConfig {
+    // 宽松配置，允许访问Swagger UI和API
+}
+
+// 测试环境配置
+@Configuration
+@EnableWebSecurity
+@Profile("test")
+public class TestSecurityConfig {
+    // 平衡配置，允许API访问但保持基本安全
+}
+
+// 生产环境配置
+@Configuration
+@EnableWebSecurity
+@Profile("prod")
+public class ProdSecurityConfig {
+    // 严格配置，只允许认证用户访问
+}
+```
+
+**优势**:
+- 环境隔离，不同环境有不同的安全策略
+- 开发便利，开发环境可以轻松访问API文档
+- 生产安全，生产环境有严格的安全保护
+
+#### 2. 环境特定配置详情
+
+**开发环境 (dev)**:
+- 允许访问Swagger UI (`/swagger-ui/**`, `/swagger-ui.html`)
+- 允许访问API文档 (`/v3/api-docs/**`, `/api-docs/**`)
+- 允许访问健康检查 (`/actuator/**`)
+- 允许访问所有API端点 (`/api/**`)
+- 禁用CSRF保护（便于API测试）
+- 允许iframe（用于Swagger UI）
+
+**测试环境 (test)**:
+- 允许访问Swagger UI和API文档
+- 允许访问健康检查
+- 允许访问API端点
+- 禁用CSRF保护
+- 允许同源iframe
+
+**生产环境 (prod)**:
+- 只允许访问健康检查端点
+- 所有其他请求需要认证
+- 启用CSRF保护
+- 禁止iframe（安全考虑）
+- 严格的会话管理
+
+**默认环境 (default)**:
+- 当没有指定profile时使用
+- 配置与开发环境类似，确保开发便利性
+
+#### 3. 配置管理策略
+**决策**: 使用Spring Profile和环境变量管理配置
+
+**实现方案**:
+```bash
+# 开发环境
+java -jar app.jar --spring.profiles.active=dev
+
+# 测试环境
+java -jar app.jar --spring.profiles.active=test
+
+# 生产环境
+java -jar app.jar --spring.profiles.active=prod
+```
+
+**优势**:
+- 配置灵活，可以根据环境动态调整
+- 部署简单，通过启动参数控制
+- 维护方便，配置集中管理
+
+### 架构评估
+
+#### 正面影响
+1. **开发效率**: 开发环境可以轻松访问API文档和测试API
+2. **安全性**: 生产环境有严格的安全保护
+3. **灵活性**: 不同环境有不同的安全策略
+4. **可维护性**: 配置集中管理，便于维护
+
+#### 负面影响
+1. **复杂性**: 增加了配置管理的复杂性
+2. **学习成本**: 开发人员需要了解不同环境的配置差异
+3. **调试难度**: 生产环境的问题可能难以在开发环境复现
+
+#### 风险评估
+- **低风险**: 开发环境配置宽松，便于调试
+- **中风险**: 测试环境需要平衡安全性和便利性
+- **高风险**: 生产环境配置严格，需要充分测试
+
+### 实施计划
+
+#### 阶段1: 基础配置 ✅
+- [x] 创建分环境安全配置类
+- [x] 配置开发环境宽松策略
+- [x] 配置生产环境严格策略
+
+#### 阶段2: 测试验证 🔄
+- [ ] 验证开发环境Swagger UI访问
+- [ ] 验证API端点访问权限
+- [ ] 验证生产环境安全保护
+
+#### 阶段3: 文档完善 🔄
+- [ ] 更新部署文档
+- [ ] 编写安全配置指南
+- [ ] 建立最佳实践
+
+### 监控指标
+
+#### 开发环境指标
+- Swagger UI访问成功率: 目标 100%
+- API测试便利性: 目标 高
+- 开发效率提升: 目标 显著
+
+#### 生产环境指标
+- 安全事件发生率: 目标 0%
+- 未授权访问拦截率: 目标 100%
+- 系统可用性: 目标 99.9%
+
+### 后续改进
+
+#### 短期改进 (1-2周)
+1. **自动化测试**: 为不同环境的安全配置编写自动化测试
+2. **监控告警**: 添加安全事件监控和告警
+3. **文档完善**: 完善安全配置文档和最佳实践
+
+#### 长期改进 (1-2月)
+1. **JWT集成**: 集成JWT认证机制
+2. **OAuth2支持**: 支持OAuth2认证
+3. **审计日志**: 添加安全审计日志功能
+
+### 经验教训
+
+#### 成功因素
+1. **需求分析准确**: 正确识别了不同环境的安全需求
+2. **架构设计合理**: 采用分环境配置，满足不同需求
+3. **实施计划清晰**: 分阶段实施，降低风险
+
+#### 改进点
+1. **提前规划**: 在项目初期就考虑安全配置
+2. **充分测试**: 在不同环境充分测试安全配置
+3. **文档先行**: 建立完善的安全配置文档
+
+### 结论
+
+通过采用基于Spring Profile的分环境安全配置，成功解决了不同环境的安全需求差异。该解决方案具有以下特点：
+
+1. **环境适配**: 不同环境有不同的安全策略，满足不同需求
+2. **开发友好**: 开发环境配置宽松，便于开发和调试
+3. **生产安全**: 生产环境配置严格，确保系统安全
+4. **配置灵活**: 通过Profile机制灵活管理不同环境配置
+
+该解决方案为项目提供了安全、灵活、可维护的安全架构，建议在类似项目中采用相同的架构模式。
+
 --- 
+
+## ADR-004: CORS跨域配置决策
+
+### 状态
+**已采纳** - 2024年7月15日
+
+### 背景
+前后端分离开发时，Swagger UI 或前端本地调试会遇到跨域（CORS）问题，导致API请求失败。
+
+### 问题分析
+- 浏览器同源策略限制，前端页面和后端API端口/域名不一致时会被拦截。
+- Spring Boot默认未开启全局CORS，导致“Failed to fetch”或OPTIONS请求被拒绝。
+
+### 解决方案
+- **开发环境（dev）**：允许所有来源、所有方法、所有头跨域，便于本地调试和Swagger UI测试。
+- **测试环境（test）**：同开发环境，便于自动化测试和多端联调。
+- **生产环境（prod）**：建议仅允许前端实际域名跨域，提升安全性。
+
+### 实现方式
+分别在 `dev` 和 `test` profile 下添加如下配置：
+```java
+@Configuration
+@Profile("dev")
+public class DevWebConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+    }
+}
+```
+
+```java
+@Configuration
+@Profile("test")
+public class TestWebConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+    }
+}
+```
+
+### 评估
+- **正面影响**：开发和测试环境前后端联调无障碍，Swagger UI/Postman可直接调试API。
+- **负面影响**：如生产环境未收敛CORS，存在安全风险。
+
+### 结论
+开发和测试环境全开放CORS，生产环境需收敛来源域名，保障安全。
+
+--- 
+
+## ADR-XXX: Flyway数据库clean权限全局环境区分配置
+
+### 决策背景
+
+- 团队需要在开发/测试环境下便捷地清空数据库（flyway:clean），但生产环境必须严格禁止，防止误删数据。
+- 以往通过application.yml控制clean-disabled，但Maven独立命令不受其影响，易出错。
+
+### 方案决策
+
+- 采用Maven profile机制，在pom.xml中为Flyway插件配置<cleanDisabled>${flyway.cleanDisabled}</cleanDisabled>，并通过profiles区分环境：
+    - dev/test profile下<flyway.cleanDisabled>false</flyway.cleanDisabled>，允许clean。
+    - prod profile下<flyway.cleanDisabled>true</flyway.cleanDisabled>，禁止clean。
+- 这样所有开发/测试成员只需加-Pdev或-Ptest参数即可安全操作，生产环境永远禁止clean，安全且易维护。
+
+### 具体配置
+
+```xml
+<plugin>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-maven-plugin</artifactId>
+    <version>9.22.3</version>
+    <configuration>
+        ...
+        <cleanDisabled>${flyway.cleanDisabled}</cleanDisabled>
+    </configuration>
+</plugin>
+
+<profiles>
+    <profile>
+        <id>dev</id>
+        <properties>
+            <flyway.cleanDisabled>false</flyway.cleanDisabled>
+        </properties>
+    </profile>
+    <profile>
+        <id>test</id>
+        <properties>
+            <flyway.cleanDisabled>false</flyway.cleanDisabled>
+        </properties>
+    </profile>
+    <profile>
+        <id>prod</id>
+        <properties>
+            <flyway.cleanDisabled>true</flyway.cleanDisabled>
+        </properties>
+    </profile>
+</profiles>
+```
+
+### 影响与收益
+- 开发/测试环境可随时clean，极大提升效率。
+- 生产环境clean永远被禁止，杜绝误操作风险。
+- 统一在pom.xml维护，团队成员无需关心细节，极易理解和迁移。
+
+--- 
+
+## 决策记录：Spring Security分号拦截与JSESSIONID兼容性
+
+### 问题背景
+在与配置网站和播控盒对接过程中，发现设备端登录请求会自动在URL中拼接 `;jsessionid=xxxx`，这是由于部分客户端或设备端不支持Cookie，采用URL传递Session ID的方式。Spring Security默认配置下，StrictHttpFirewall会拒绝所有带分号（;）的URL，导致设备端无法正常登录，后端日志出现 `RequestRejectedException: The request was rejected because the URL contained a potentially malicious String ";"`。
+
+### 决策说明
+为兼容设备端和配置网站的登录与指令下发需求，决定在开发和对接阶段放宽Spring Security的分号限制，允许带分号的URL通过防火墙。后续如需收紧安全策略，可根据实际情况调整。
+
+### 具体措施
+- 在Spring Security配置中，允许分号通过StrictHttpFirewall。
+- 仅在开发/对接环境放开，生产环境根据实际安全需求决定是否放开。

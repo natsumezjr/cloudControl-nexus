@@ -178,7 +178,7 @@ public class UserController {
         userService.createUser(new User());
     }
 }
-```
+
 
 **优势：**
 - 强制依赖，无法创建对象时没有依赖
@@ -1483,7 +1483,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 检查邮箱是否存在
     boolean existsByEmail(String email);
 }
-```
+
 
 **JpaRepository的特点：**
 - 继承自Spring Data JPA，提供基础的CRUD操作
@@ -1655,7 +1655,7 @@ public class UserController {
 - `ResponseEntity<User>`表示返回User对象的HTTP响应
 - 提供静态方法创建不同状态的响应（ok、badRequest、created等）
 }
-```
+
 
 **@RestController注解的作用：**
 - ✅ 标记为REST控制器

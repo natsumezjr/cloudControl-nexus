@@ -215,10 +215,33 @@
                     <locations>
                         <location>classpath:db/migration</location>
                     </locations>
+                    <cleanDisabled>${flyway.cleanDisabled}</cleanDisabled>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    
+    <!-- 环境区分配置：dev/test允许clean，prod禁止clean -->
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <flyway.cleanDisabled>false</flyway.cleanDisabled>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <flyway.cleanDisabled>false</flyway.cleanDisabled>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <flyway.cleanDisabled>true</flyway.cleanDisabled>
+            </properties>
+        </profile>
+    </profiles>
     
     <!-- ==================== 依赖管理 ==================== -->
     <dependencyManagement>

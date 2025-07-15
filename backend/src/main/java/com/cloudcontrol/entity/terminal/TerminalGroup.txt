@@ -190,19 +190,4 @@ public class TerminalGroup {
         child.setParent(null);
     }
     
-    /**
-     * 添加终端
-     */
-    public void addTerminal(Terminal terminal) {
-        terminals.add(terminal);
-        terminal.setTerminalGroup(this);
-    }
-    
-    /**
-     * 移除终端
-     */
-    public void removeTerminal(Terminal terminal) {
-        terminals.remove(terminal);
-        terminal.setTerminalGroup(null);
-    }
 }

@@ -1,0 +1,38 @@
+package com.cloudcontrol.dto.terminal;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * 终端登录响应
+ */
+public class TerminalLoginResponse {
+    
+    @JsonProperty("name")
+    private String accountName; // 终端账号（前端字段为name，后端字段为accountName）
+    
+    private String password;    // 终端密码
+    private String url;         // 云平台地址
+    @JsonProperty("devicestatus")
+    private String status;      // 终端状态（如 sleep）
+    private boolean internet;   // 是否联网
+    private boolean login;      // 登录是否成功
+
+    // Getters and Setters
+    public String getAccountName() { return accountName; }
+    public void setAccountName(String accountName) { this.accountName = accountName; }
+    
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    
+    public String getUrl() { return url; }
+    public void setUrl(String url) { this.url = url; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    
+    public boolean isInternet() { return internet; }
+    public void setInternet(boolean internet) { this.internet = internet; }
+    
+    public boolean isLogin() { return login; }
+    public void setLogin(boolean login) { this.login = login; }
+} 
