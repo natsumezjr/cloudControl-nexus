@@ -12,14 +12,18 @@ import com.cloudcontrol.entity.command.Command;
 import com.cloudcontrol.enums.command.CommandType;
 import java.sql.Timestamp;
 import org.springframework.http.HttpStatus;
+import com.cloudcontrol.entity.terminal.Terminal;
+import com.cloudcontrol.repository.terminal.TerminalRepository;
 
 @Service
 public class FtdBckCommandServiceImpl implements FtdBckCommandService<Ftd2BckCommandHttpRequest, Bck2FtdCommandHttpResponse> {
 
     private CommandRepository commandRepository;
+    private TerminalRepository terminalRepository;
 
-    public FtdBckCommandServiceImpl(CommandRepository commandRepository) {
+    public FtdBckCommandServiceImpl(CommandRepository commandRepository, TerminalRepository terminalRepository) {
         this.commandRepository = commandRepository;
+        this.terminalRepository = terminalRepository;
     }
 
     @Transactional
@@ -30,15 +34,22 @@ public class FtdBckCommandServiceImpl implements FtdBckCommandService<Ftd2BckCom
 
         // 根据cmdType获取指令类型
         CommandType cmd = CommandType.fromCmdType(cmdType);
-        /*  
-        // 根据终端ID获取终端
 
+        // 根据终端ID获取终端
+        for (Integer terminalId : terminalIds) {
+            Terminal terminal = terminalRepository.findById(terminalId).orElse(null);
+            if (terminal == null) {
+                return new Bck2FtdCommandHttpResponse(null, HttpStatus.NOT_FOUND);
+            }
+        }
+
+        /*
         // 根据指令类型对终端字段进行处理，暂不实现
 
         */
         // 对于每个终端，将指令存储到数据库，redis保存value
         try {
-            for (int terminalId : terminalIds) {
+            for (Integer terminalId : terminalIds) {
                 Command command = new Command();
                 command.setTerminalId(terminalId);
                 command.setValue(value);

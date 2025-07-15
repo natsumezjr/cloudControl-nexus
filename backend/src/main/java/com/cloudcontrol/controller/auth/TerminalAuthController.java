@@ -12,21 +12,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api")
-public class TerminalLogController {
+public class TerminalAuthController {
 
     private final TerminalAuthService terminalAuthService;
 
-    public TerminalLogController(TerminalAuthService terminalAuthService) {
+    public TerminalAuthController(TerminalAuthService terminalAuthService) {
         this.terminalAuthService = terminalAuthService;
     }
 
     @PostMapping("/login")
     public TerminalLoginResponse login(@RequestBody TerminalLoginRequest request) {
-        return terminalAuthService.login(request);
+        try {
+            return terminalAuthService.login(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @PostMapping("/register")
     public TerminalRegisterResponse register(@RequestBody TerminalRegisterRequest request) {
-        return terminalAuthService.register(request);
+        try {
+            return terminalAuthService.register(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

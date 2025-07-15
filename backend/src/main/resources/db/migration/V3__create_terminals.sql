@@ -3,7 +3,7 @@
 -- 描述: 创建终端表，字段与Terminal实体类完全一致
 
 CREATE TABLE terminals (
-    serial_no INTEGER PRIMARY KEY, -- 设备序列号，自增主键
+    serial_no INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- 设备序列号，自增主键
     device_name VARCHAR(255) NOT NULL, -- 设备名称（注册时必填）
     password VARCHAR(255) NOT NULL, -- 终端账号密码
     account_name VARCHAR(255), -- 终端账号名称

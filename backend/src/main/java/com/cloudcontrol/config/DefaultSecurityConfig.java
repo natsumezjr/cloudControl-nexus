@@ -33,6 +33,7 @@ public class DefaultSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable());
         // 你的安全配置（如有其它配置请补充）
         return http.build();
     }

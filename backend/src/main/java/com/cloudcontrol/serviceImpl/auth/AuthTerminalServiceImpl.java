@@ -21,45 +21,49 @@ public class AuthTerminalServiceImpl implements TerminalAuthService {
 
     @Override
     public TerminalLoginResponse login(TerminalLoginRequest request) {
-        Optional<Terminal> optionalTerminal = terminalRepository.findByAccountNameAndPassword(
-            request.getAccountName(), 
-            request.getPassword()
-        );
-        
-        TerminalLoginResponse response = new TerminalLoginResponse();
-        response.setAccountName(request.getAccountName());
-        response.setPassword(request.getPassword());
-        response.setUrl(request.getUrl());
-        response.setStatus(request.getStatus());
-        response.setInternet(request.isInternet());
-
-        if (optionalTerminal.isPresent()) {
-            response.setLogin(true);
-        } else {
-            response.setLogin(false);
+        try {
+            Optional<Terminal> optionalTerminal = terminalRepository.findByAccountNameAndPassword(
+                request.getAccountName(), 
+                request.getPassword()
+            );
+            TerminalLoginResponse response = new TerminalLoginResponse();
+            response.setAccountName(request.getAccountName());
+            response.setPassword(request.getPassword());
+            response.setUrl(request.getUrl());
+            response.setStatus(request.getStatus());
+            response.setInternet(request.isInternet());
+            if (optionalTerminal.isPresent()) {
+                response.setLogin(true);
+            } else {
+                response.setLogin(false);
+            }
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
-        
-        return response;
     }
 
     @Override
     public TerminalRegisterResponse register(TerminalRegisterRequest request) {
-        Terminal terminal = new Terminal();
-        terminal.setAccountName(request.getAccountName());
-        terminal.setPassword(request.getPassword());
-        terminal.setDeviceName(request.getDeviceName()); // 设置设备名称（必填）
-        terminal.setStatus(request.getStatus()); // 设置状态
-        
-        terminalRepository.save(terminal);
-        
-        TerminalRegisterResponse response = new TerminalRegisterResponse();
-        response.setAccountName(request.getAccountName());
-        response.setPassword(request.getPassword());
-        response.setUrl(request.getUrl());
-        response.setStatus(request.getStatus());
-        response.setInternet(request.isInternet());
-        response.setSuccess(true);
-        
-        return response;
+        try {
+            Terminal terminal = new Terminal();
+            terminal.setAccountName(request.getAccountName());
+            terminal.setPassword(request.getPassword());
+            terminal.setDeviceName(request.getDeviceName()); // 设置设备名称（必填）
+            terminal.setStatus(request.getStatus()); // 设置状态
+            terminalRepository.save(terminal);
+            TerminalRegisterResponse response = new TerminalRegisterResponse();
+            response.setAccountName(request.getAccountName());
+            response.setPassword(request.getPassword());
+            response.setUrl(request.getUrl());
+            response.setStatus(request.getStatus());
+            response.setInternet(request.isInternet());
+            response.setSuccess(true);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

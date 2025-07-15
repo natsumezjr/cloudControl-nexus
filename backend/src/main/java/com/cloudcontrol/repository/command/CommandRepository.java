@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface CommandRepository extends JpaRepository<Command, Integer> {
     // 按终端ID查询所有指令
-    List<Command> findByTerminalId(int terminalId);
+    List<Command> findByTerminalId(Integer terminalId);
 
     // 按指令类型编号查询
     List<Command> findByCmdNum(int cmdNum);

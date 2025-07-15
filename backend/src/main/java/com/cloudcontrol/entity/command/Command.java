@@ -15,7 +15,7 @@ public class Command {
 
     @Column(name = "terminal_id", nullable = false)
     @JsonProperty("post")
-    private int terminalId;
+    private Integer terminalId;
 
     @Column(name = "cmd_num", nullable = false)
     private int cmdNum;
@@ -34,8 +34,8 @@ public class Command {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public int getTerminalId() { return terminalId; }
-    public void setTerminalId(int terminalId) { this.terminalId = terminalId; }
+    public Integer getTerminalId() { return terminalId; }
+    public void setTerminalId(Integer terminalId) { this.terminalId = terminalId; }
 
     public int getCmdNum() { return cmdNum; }
     public void setCmdNum(int cmdNum) { this.cmdNum = cmdNum; }
