@@ -3,6 +3,7 @@ package com.cloudcontrol.entity.command;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Entity
 @Table(name = "commands")
@@ -14,19 +15,15 @@ public class Command {
 
     @Column(name = "terminal_id", nullable = false)
     @JsonProperty("post")
-    private Long terminalId;
+    private int terminalId;
 
-    @Column(name = "author_url", nullable = false)
-    @JsonProperty("author_url")
-    private String authorUrl;
+    @Column(name = "cmd_num", nullable = false)
+    private int cmdNum;
 
-    @Embedded
-    @JsonProperty("content")
-    private Content content;
+    // value 字段仅用于业务逻辑和缓存，不做数据库持久化
+    @Transient
+    private Optional<Object> value;
 
-    @Column(name = "karma", nullable = false)
-    @JsonProperty("karma")
-    private Integer karma;
 
     @Column(name = "created_at")
     @JsonProperty("created_at")
@@ -34,34 +31,18 @@ public class Command {
 
     // getter/setter 省略
 
-    @Embeddable
-    public static class Content {
-        @Column(name = "content_raw", columnDefinition = "TEXT", nullable = false)
-        @JsonProperty("raw")
-        private String raw;
-
-        public String getRaw() { return raw; }
-        public void setRaw(String raw) { this.raw = raw; }
-    }
-
-    // Command类
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Long getTerminalId() { return terminalId; }
-    public void setTerminalId(Long terminalId) { this.terminalId = terminalId; }
+    public int getTerminalId() { return terminalId; }
+    public void setTerminalId(int terminalId) { this.terminalId = terminalId; }
 
-    public String getAuthorUrl() { return authorUrl; }
-    public void setAuthorUrl(String authorUrl) { this.authorUrl = authorUrl; }
+    public int getCmdNum() { return cmdNum; }
+    public void setCmdNum(int cmdNum) { this.cmdNum = cmdNum; }
 
-    public Content getContent() { return content; }
-    public void setContent(Content content) { this.content = content; }
-
-    public Integer getKarma() { return karma; }
-    public void setKarma(Integer karma) { this.karma = karma; }
+    public Optional<Object> getValue() { return value; }
+    public void setValue(Optional<Object> value) { this.value = value; }
 
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
-
-
 }

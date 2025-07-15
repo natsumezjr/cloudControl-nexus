@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getApiBaseUrl, getWpApiEndpoint, getApi, getErrorMessage } from '../settings'
+import { getApiBaseUrl, getApi, getErrorMessage } from '../settings'
 
 // 创建axios实例
 const api = axios.create({
@@ -13,7 +13,6 @@ const api = axios.create({
 // 请求拦截器
 api.interceptors.request.use(
   (config) => {
-    // 可以在这里添加认证token等
     console.log('发送请求:', config)
     return config
   },
@@ -35,20 +34,10 @@ api.interceptors.response.use(
   }
 )
 
-// 单条指令接口类型定义
-export interface SingleCommand {
-  post: number
-  metadata: {
-    act_url: string
-    act_method: number
-  }
-  content: string
-}
-
-// 批量指令接口类型定义
-export interface BatchCommand {
-  post: number
-  CommentData: SingleCommand[]
+// 新指令参数类型
+type DeviceCommandPayload = {
+  terminalIds: number[]
+  value?: string
 }
 
 // 设备响应接口类型定义
@@ -60,12 +49,19 @@ export interface DeviceResponse {
   timestamp: number
 }
 
-// 发送设备指令（支持单条和批量）
-export const sendDeviceCommand = async (command: SingleCommand | BatchCommand): Promise<DeviceResponse> => {
+/**
+ * 发送设备指令（新接口，POST到 /wp-json/wp/v2/comments/xxxCommand）
+ * @param commandType 指令类型（如 brightnessCommand）
+ * @param payload { terminalIds, value }
+ */
+export const sendDeviceCommand = async (
+  commandType: string,
+  payload: DeviceCommandPayload
+): Promise<DeviceResponse> => {
   try {
-    // 根据接口要求，发送到 /wp-json/wp/v2/comments
-    const response = await api.post(getApi().WP_ENDPOINTS.COMMENTS, command)
-    return response as DeviceResponse
+    const url = `/wp-json/wp/v2/comments/${commandType}`
+    const response = await api.post(url, payload)
+    return response as unknown as DeviceResponse
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || getErrorMessage('API_ERROR'))
   }
@@ -75,7 +71,7 @@ export const sendDeviceCommand = async (command: SingleCommand | BatchCommand): 
 export const getDeviceList = async (): Promise<DeviceResponse> => {
   try {
     const response = await api.get(getApi().CUSTOM_ENDPOINTS.DEVICE_STATUS)
-    return response as DeviceResponse
+    return response as unknown as DeviceResponse
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || getErrorMessage('API_ERROR'))
   }
@@ -85,7 +81,7 @@ export const getDeviceList = async (): Promise<DeviceResponse> => {
 export const getDeviceDetail = async (deviceId: string): Promise<DeviceResponse> => {
   try {
     const response = await api.get(`${getApi().CUSTOM_ENDPOINTS.DEVICE_STATUS}/${deviceId}`)
-    return response as DeviceResponse
+    return response as unknown as DeviceResponse
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || getErrorMessage('API_ERROR'))
   }
@@ -95,7 +91,7 @@ export const getDeviceDetail = async (deviceId: string): Promise<DeviceResponse>
 export const connectDevice = async (deviceId: string): Promise<DeviceResponse> => {
   try {
     const response = await api.post(`${getApi().CUSTOM_ENDPOINTS.DEVICE_CONTROL}/connect`, { deviceId })
-    return response as DeviceResponse
+    return response as unknown as DeviceResponse
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || getErrorMessage('API_ERROR'))
   }
@@ -105,7 +101,7 @@ export const connectDevice = async (deviceId: string): Promise<DeviceResponse> =
 export const disconnectDevice = async (deviceId: string): Promise<DeviceResponse> => {
   try {
     const response = await api.post(`${getApi().CUSTOM_ENDPOINTS.DEVICE_CONTROL}/disconnect`, { deviceId })
-    return response as DeviceResponse
+    return response as unknown as DeviceResponse
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || getErrorMessage('API_ERROR'))
   }
@@ -115,7 +111,7 @@ export const disconnectDevice = async (deviceId: string): Promise<DeviceResponse
 export const getDeviceStatus = async (deviceId: string): Promise<DeviceResponse> => {
   try {
     const response = await api.get(`${getApi().CUSTOM_ENDPOINTS.DEVICE_STATUS}/${deviceId}`)
-    return response as DeviceResponse
+    return response as unknown as DeviceResponse
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || getErrorMessage('API_ERROR'))
   }

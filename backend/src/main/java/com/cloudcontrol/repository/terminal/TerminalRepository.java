@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TerminalRepository extends JpaRepository<Terminal, Long> {
-    Optional<Terminal> findBySerialNo(Long serialNo);
+public interface TerminalRepository extends JpaRepository<Terminal, Integer> {
+    Optional<Terminal> findBySerialNo(int serialNo);
     Optional<Terminal> findByDeviceName(String deviceName);
     Optional<Terminal> findByAccountNameAndPassword(String accountName, String password);
 } 

@@ -50,7 +50,7 @@ public class AuthTerminalServiceImpl implements TerminalAuthService {
         terminal.setDeviceName(request.getDeviceName()); // 设置设备名称（必填）
         terminal.setStatus(request.getStatus()); // 设置状态
         
-        Terminal savedTerminal = terminalRepository.save(terminal);
+        terminalRepository.save(terminal);
         
         TerminalRegisterResponse response = new TerminalRegisterResponse();
         response.setAccountName(request.getAccountName());

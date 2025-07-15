@@ -3,7 +3,7 @@ package com.cloudcontrol.dto.command;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 
-public class CommandDTO {
+public class Bck2TmnlCommandGetResponse implements CommandResponse {
     @JsonProperty("id")
     private Long id;
 

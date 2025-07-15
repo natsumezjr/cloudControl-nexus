@@ -2,9 +2,7 @@
 CREATE TABLE commands (
     id BIGSERIAL PRIMARY KEY,
     terminal_id BIGINT NOT NULL,
-    author_url VARCHAR(255) NOT NULL,
-    content_raw TEXT NOT NULL,
-    karma INTEGER NOT NULL,
+    cmd_num INTEGER NOT NULL, -- 对应 CommandType 枚举的编号
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_command_terminal
         FOREIGN KEY (terminal_id) REFERENCES terminals(serial_no)

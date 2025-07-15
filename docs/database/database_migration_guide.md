@@ -42,6 +42,44 @@
 - application.yml 未切换：测试用错数据库。
 - 环境变量/编码问题：Windows 下需指定 encoding='utf-8'。
 
+## 数据库迁移命令用法与环境隔离
+
+本项目所有数据库迁移、清理操作，均需通过 Maven profiles 切换环境，确保操作在正确的数据库：
+
+- **开发环境**：
+  ```sh
+  mvn flyway:migrate -Pdev
+  ```
+- **测试环境**：
+  ```sh
+  mvn flyway:clean -Ptest
+  mvn flyway:migrate -Ptest
+  ```
+- **生产环境**：
+  ```sh
+  mvn flyway:migrate -Pprod
+  ```
+
+**注意事项：**
+- profiles 配置在 pom.xml，所有数据库连接参数按环境隔离，绝不串用。
+- 生产环境禁止 clean，防止误删数据。
+- 迁移脚本、application.yml、pom.xml 三者需保持一致。
+
+**强烈建议：**
+- 任何迁移、清理操作前，务必确认当前 profile，避免误操作生产库。
+
 ---
+
+## 自动化脚本索引
+
+- **测试环境一键清空+迁移脚本**：
+  - 脚本路径：`backend/reset_test_db.ps1`
+  - 适用环境：Windows PowerShell
+  - 用法：
+    ```powershell
+    # 进入项目根目录后执行
+    ./backend/reset_test_db.ps1
+    ```
+  - 功能说明：依次执行 Flyway clean 和 migrate，彻底清空并重建 cloudcontrol_test 数据库，确保测试环境结构与生产一致。
 
 如遇新问题，优先补充本指南，保持团队知识闭环。 

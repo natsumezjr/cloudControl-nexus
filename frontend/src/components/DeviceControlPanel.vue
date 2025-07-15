@@ -161,7 +161,7 @@
           <span>批量指令队列 ({{ batchCommands.length }} 条)</span>
         </template>
         <div v-for="(cmd, index) in batchCommands" :key="index" class="batch-item">
-          <span>{{ cmd.name }}</span>
+          <span>{{ cmd.type }}</span>
           <el-button size="small" type="danger" @click="removeFromBatch(index)">删除</el-button>
         </div>
       </el-card>
@@ -180,14 +180,14 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { sendDeviceCommand } from '@/api/deviceApi'
+import { sendDeviceCommand } from '../api/deviceApi'
 
 // 响应式数据
 const loading = ref(false)
 const connectionStatus = ref(false)
-const responseData = ref(null)
+const responseData = ref<any>(null)
 const commandMode = ref('single')
-const batchCommands = ref<Array<{name: string, command: any}>>([])
+const batchCommands = ref<Array<{type: string, payload: any}>>([])
 
 const deviceInfo = reactive({
   post: 1,
@@ -203,12 +203,10 @@ const sendCommand = async (commandType: string) => {
 
   loading.value = true
   try {
-    const commandData = generateCommandData(commandType)
-    console.log(`发送指令: ${commandType}`, commandData)
-    
-    const response = await sendDeviceCommand(commandData)
+    const payload = generateCommandPayload(commandType)
+    console.log(`发送指令: ${commandType}`, payload)
+    const response = await sendDeviceCommand(commandType, payload)
     responseData.value = response
-    
     ElMessage.success(`指令 ${commandType} 发送成功`)
   } catch (error: any) {
     console.error('发送指令失败:', error)
@@ -220,10 +218,10 @@ const sendCommand = async (commandType: string) => {
 
 // 添加到批量队列
 const addToBatch = (commandType: string) => {
-  const commandData = generateCommandData(commandType)
+  const payload = generateCommandPayload(commandType)
   batchCommands.value.push({
-    name: getCommandName(commandType),
-    command: commandData
+    type: commandType,
+    payload
   })
   ElMessage.success('已添加到批量队列')
 }
@@ -248,15 +246,10 @@ const sendBatchCommands = async () => {
 
   loading.value = true
   try {
-    const batchData = {
-      post: deviceInfo.post,
-      CommentData: batchCommands.value.map(item => item.command)
+    // 依次发送每条批量指令
+    for (const cmd of batchCommands.value) {
+      await sendDeviceCommand(cmd.type, cmd.payload)
     }
-    
-    console.log('发送批量指令:', batchData)
-    const response = await sendDeviceCommand(batchData)
-    responseData.value = response
-    
     ElMessage.success(`批量指令发送成功，共 ${batchCommands.value.length} 条`)
     batchCommands.value = []
   } catch (error: any) {
@@ -267,304 +260,34 @@ const sendBatchCommands = async () => {
   }
 }
 
-// 获取指令名称
-const getCommandName = (commandType: string): string => {
-  const commandNames: Record<string, string> = {
-    wakeup: '唤醒指令',
-    sleep: '休眠指令',
-    reboot: '重启指令',
-    screenshot: '屏幕截屏',
-    clearCache: '清理缓存',
-    brightness: '亮度指令',
-    colortemp: '色温指令',
-    inputmode: '切换信号源',
-    volume: '音量指令',
-    boardRelay: '板载继电器',
-    relay: '继电器指令',
-    update: '升级指令',
-    locale: '语言和地区设置',
-    timezone: '时区设置',
-    gpsReport: 'GPS上报间隔',
-    sensorReport: '监控上报间隔',
-    contentReport: '内容上报开关',
-    logReport: '日志上报开关',
-    rotateProgramReport: '轮播节目名上报',
-    updateProgram: '更新节目',
-    switchProgram: '切换节目',
-    clearPrograms: '清空节目',
-    deleteProgram: '删除节目',
-    currentLog: '运行日志上报',
-    ifstatus: '网络接口配置'
-  }
-  return commandNames[commandType] || commandType
-}
 
-// 根据指令类型生成对应的数据格式
-const generateCommandData = (commandType: string) => {
-  const baseData = {
-    post: deviceInfo.post
-  }
-
+// 新格式：根据指令类型生成payload
+const generateCommandPayload = (commandType: string) => {
+  const terminalIds = [deviceInfo.post]
   switch (commandType) {
-    case 'wakeup':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/action",
-          act_method: 1
-        },
-        content: "{\"command\":\"wakeup\"}"
-      }
-
-    case 'sleep':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/action",
-          act_method: 1
-        },
-        content: "{\"command\":\"sleep\"}"
-      }
-
-    case 'reboot':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/action",
-          act_method: 1
-        },
-        content: "{\"command\":\"reboot\"}"
-      }
-
-    case 'screenshot':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "transmission/ftp/config",
-          act_method: 0
-        },
-        content: "{}"
-      }
-
-    case 'clearCache':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/clrresunused",
-          act_method: 3
-        },
-        content: "{}"
-      }
-
-    case 'brightness':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/brightness",
-          act_method: 2
-        },
-        content: "{\"brightness\":80}"
-      }
-
-    case 'colortemp':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/colortemp",
-          act_method: 2
-        },
-        content: "{\"colortemp\":10000}"
-      }
-
-    case 'inputmode':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/inputmode",
-          act_method: 2
-        },
-        content: "{\"inputmode\":\"dvi\"}"
-      }
-
-    case 'volume':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/volume",
-          act_method: 2
-        },
-        content: "{\"musicvolume\":10}"
-      }
-
-    case 'boardRelay':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/board_relay",
-          act_method: 2
-        },
-        content: "[{\"relay\":1,\"delay\":0,\"status\":1}]"
-      }
-
-    case 'relay':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/relay",
-          act_method: 2
-        },
-        content: "[{\"relay\":1,\"delay\":0,\"status\":0},{\"relay\":2,\"delay\":0,\"status\":1},{\"relay\":3,\"delay\":0,\"status\":0}]"
-      }
-
-    case 'update':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/update",
-          act_method: 0
-        },
-        content: "http://ip/wp-content/upload/2020/12/update_c1_v1.67.1.1329_b7c809cdb9bd4a78500d3bd8c27f0de9_480774370.zip"
-      }
-
-    case 'locale':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/locale",
-          act_method: 2
-        },
-        content: "{\"language\":\"zh\",\"country\":\"CN\"}"
-      }
-
-    case 'timezone':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/newrtc",
-          act_method: 2
-        },
-        content: "{\"timezoneId\":\"Asia/Shanghai\",\"timezone\":8,\"isautotime\":1}"
-      }
-
-    case 'gpsReport':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/setreporttime",
-          act_method: 1
-        },
-        content: "{\"gps.report.interval\":30}"
-      }
-
-    case 'sensorReport':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/setreporttime",
-          act_method: 1
-        },
-        content: "{\"sensor.report.interval\":\"300\",\"ber.report.interval\":\"300\"}"
-      }
-
-    case 'contentReport':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/contentreport",
-          act_method: 2
-        },
-        content: "{\"status\":1}"
-      }
-
-    case 'logReport':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/reportswitch",
-          act_method: 2
-        },
-        content: "{\"log_report\":\"on\"}"
-      }
-
-    case 'rotateProgramReport':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/reportswitch",
-          act_method: 2
-        },
-        content: "{\"rotate_program_vsns_report\":\"on\"}"
-      }
-
-    case 'updateProgram':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "",
-          act_method: 0
-        },
-        content: "{\"program\":\"dirty\"}"
-      }
-
-    case 'switchProgram':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/vsns/sources/internet/vsns/ProgramDocumentImage_7557cda64942545a6843bbe93d07012f_1048.vsn/activated",
-          act_method: 2
-        },
-        content: "{\"command\":\"\"}"
-      }
-
-    case 'clearPrograms':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/clrprgms",
-          act_method: 3
-        },
-        content: "{}"
-      }
-
-    case 'deleteProgram':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/vsns/sources/internet/vsns/Playlist9017_783596d9ee396d7a604dac56a6979546_1332.vsn",
-          act_method: 3
-        },
-        content: "{\"command\":\"\"}"
-      }
-
-    case 'currentLog':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/current_log",
-          act_method: 0
-        },
-        content: "{}"
-      }
-
-    case 'ifstatus':
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/ifstatus",
-          act_method: 0
-        },
-        content: "{}"
-      }
-
+    case 'brightnessCommand':
+      return { terminalIds, value: '66' }
+    case 'upgradeCommand':
+      return { terminalIds, value: 'http://ip/wp-content/upload/2020/12/update_c1_v1.67.1.1329_b7c809cdb9bd4a78500d3bd8c27f0de9_480774370.zip' }
+    case 'rebootCommand':
+    case 'screenshotCommand':
+    case 'sleepCommand':
+    case 'wakeupCommand':
+    case 'clearCacheCommand':
+      return { terminalIds }
+    case 'boardRelayCommand':
+      return { terminalIds, value: '1' }
+    case 'relayCommand':
+      return { terminalIds, value: '[0,1,0]' }
+    case 'colortempCommand':
+      return { terminalIds, value: '10000' }
+    case 'switchSignalSourceCommand':
+      return { terminalIds, value: '1' }
+    case 'volumeCommand':
+      return { terminalIds, value: '10' }
+    // 其余case也返回新格式，哪怕只是 { terminalIds }
     default:
-      return {
-        ...baseData,
-        metadata: {
-          act_url: "api/action",
-          act_method: 1
-        },
-        content: "{}"
-      }
+      return { terminalIds }
   }
 }
 </script>

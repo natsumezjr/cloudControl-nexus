@@ -542,6 +542,30 @@ public class TestWebConfig implements WebMvcConfigurer {
 
 --- 
 
+## 数据库环境隔离与迁移参数全局配置决策
+
+为保证开发、测试、生产环境数据库彻底隔离，防止误删、误操作生产库，项目采用如下架构决策：
+
+- 所有数据库连接参数（url、user、password）全部在 pom.xml 的 <profiles> 节点下按 dev、test、prod 分别配置。
+- 只需用 -Pdev、-Ptest、-Pprod，Maven/Flyway 会自动切换对应数据库，无需手动传参。
+- Spring Boot 启动时用 --spring.profiles.active=dev/test/prod 激活对应 profile，application.yml 里也按 profile 分别配置数据源、日志、缓存等。
+- 这样可彻底避免环境串用、误删生产库等风险，极易维护和自动化。
+
+**示例：**
+```sh
+# 开发环境
+mvn flyway:migrate -Pdev
+# 测试环境
+mvn flyway:clean -Ptest
+mvn flyway:migrate -Ptest
+# 生产环境
+mvn flyway:migrate -Pprod
+```
+
+此决策为企业级项目推荐实践，适用于所有敏感参数的环境隔离。
+
+--- 
+
 ## 决策记录：Spring Security分号拦截与JSESSIONID兼容性
 
 ### 问题背景
@@ -553,3 +577,33 @@ public class TestWebConfig implements WebMvcConfigurer {
 ### 具体措施
 - 在Spring Security配置中，允许分号通过StrictHttpFirewall。
 - 仅在开发/对接环境放开，生产环境根据实际安全需求决定是否放开。
+
+---
+
+### 指令下发与终端轮询的存储架构决策
+
+#### 现状（测试阶段）
+- 所有指令仅存储于PostgreSQL（psql）数据库。
+- 便于开发调试、数据一致性和后续追溯。
+- 适合指令量不大、并发压力有限的场景。
+
+#### 推荐方案（生产环境）
+- 采用Redis+PostgreSQL混合存储：
+  - Redis：存储待下发/待处理的实时指令队列，终端轮询时优先从Redis拉取，拉取后可删除或标记。
+  - PostgreSQL：存储所有指令历史归档，便于追溯、统计、审计。
+- 优点：
+  - Redis高并发、低延迟，适合实时轮询。
+  - PostgreSQL保证数据安全和可追溯。
+- 流程：
+  1. 指令下发时，写入Redis（实时）+ PostgreSQL（归档）。
+  2. 终端轮询时，从Redis拉取指令。
+  3. 指令执行结果、状态等写回PostgreSQL。
+- 适用场景：
+  - 指令量大、终端轮询频繁、实时性要求高的生产环境。
+
+#### 只用Redis/只用PostgreSQL的适用场景
+- 只用Redis：仅适合极简、无追溯需求的场景（不推荐）。
+- 只用PostgreSQL：适合小型项目或对实时性要求不高的场景。
+
+#### 结论
+- 测试阶段先用PostgreSQL，后续可平滑升级为Redis+PostgreSQL混合架构。

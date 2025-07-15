@@ -10,7 +10,7 @@ public class Terminal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("serialNo")
-    private Long serialNo; // 设备序列号（自增主键）
+    private int serialNo; // 设备序列号（自增主键）
 
     @Column(nullable = false)
     @JsonProperty("deviceName")
@@ -45,8 +45,8 @@ public class Terminal {
     private String extra; // 预留扩展字段
 
     // getter and setter
-    public Long getSerialNo() { return serialNo; }
-    public void setSerialNo(Long serialNo) { this.serialNo = serialNo; }
+    public int getSerialNo() { return serialNo; }
+    public void setSerialNo(int serialNo) { this.serialNo = serialNo; }
     public String getDeviceName() { return deviceName; }
     public void setDeviceName(String deviceName) { this.deviceName = deviceName; }
     public String getPassword() { return password; }
