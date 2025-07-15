@@ -1,50 +1,28 @@
-package com.cloudcontrol.entity.command;
+package com.cloudcontrol.dto.command;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "commands")
-public class Command {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CommandDTO {
     @JsonProperty("id")
     private Long id;
 
-    @Column(name = "terminal_id", nullable = false)
     @JsonProperty("post")
     private Long terminalId;
 
-    @Column(name = "author_url", nullable = false)
     @JsonProperty("author_url")
     private String authorUrl;
 
-    @Embedded
     @JsonProperty("content")
     private Content content;
 
-    @Column(name = "karma", nullable = false)
     @JsonProperty("karma")
     private Integer karma;
 
-    @Column(name = "created_at")
     @JsonProperty("created_at")
     private Timestamp createdAt;
 
-    // getter/setter 省略
-
-    @Embeddable
-    public static class Content {
-        @Column(name = "content_raw", columnDefinition = "TEXT", nullable = false)
-        @JsonProperty("raw")
-        private String raw;
-
-        public String getRaw() { return raw; }
-        public void setRaw(String raw) { this.raw = raw; }
-    }
-
-    // Command类
+    // getter/setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -63,5 +41,11 @@ public class Command {
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
+    public static class Content {
+        @JsonProperty("raw")
+        private String raw;
 
-}
+        public String getRaw() { return raw; }
+        public void setRaw(String raw) { this.raw = raw; }
+    }
+} 

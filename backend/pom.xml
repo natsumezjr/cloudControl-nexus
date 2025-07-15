@@ -208,10 +208,6 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.22.3</version>
                 <configuration>
-                    <!-- 使用默认开发环境配置，可通过命令行参数覆盖 -->
-                    <url>jdbc:postgresql://localhost:5432/cloudcontrol_dev</url>
-                    <user>postgres</user>
-                    <password>bupt_test</password>
                     <locations>
                         <location>classpath:db/migration</location>
                     </locations>
@@ -227,18 +223,27 @@
             <id>dev</id>
             <properties>
                 <flyway.cleanDisabled>false</flyway.cleanDisabled>
+                <flyway.url>jdbc:postgresql://localhost:5432/cloudcontrol_dev</flyway.url>
+                <flyway.user>postgres</flyway.user>
+                <flyway.password>bupt_test</flyway.password>
             </properties>
         </profile>
         <profile>
             <id>test</id>
             <properties>
                 <flyway.cleanDisabled>false</flyway.cleanDisabled>
+                <flyway.url>jdbc:postgresql://localhost:5432/cloudcontrol_test</flyway.url>
+                <flyway.user>postgres</flyway.user>
+                <flyway.password>bupt_test</flyway.password>
             </properties>
         </profile>
         <profile>
             <id>prod</id>
             <properties>
                 <flyway.cleanDisabled>true</flyway.cleanDisabled>
+                <flyway.url>jdbc:postgresql://prod-db:5432/cloudcontrol_prod</flyway.url>
+                <flyway.user>${DB_USERNAME}</flyway.user>
+                <flyway.password>${DB_PASSWORD}</flyway.password>
             </properties>
         </profile>
     </profiles>
