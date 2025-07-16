@@ -43,7 +43,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate  # 使用Flyway后改为validate，让Flyway管理表结构
-    show-sql: true  # 在控制台显示SQL语句
+    show-sql: false  # 全局默认关闭SQL
     properties:
       hibernate:
         format_sql: true  # 格式化SQL输出
@@ -133,11 +133,12 @@ spring:
 # ==================== 日志配置 ====================
 logging:
   level:
-    com.cloudcontrol: DEBUG  # 应用包日志级别
-    org.springframework.security: DEBUG  # 安全框架日志级别
-    org.springframework.web: DEBUG  # Web框架日志级别
-    org.hibernate.SQL: DEBUG  # SQL语句日志
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # SQL参数日志
+    root: INFO
+    com.cloudcontrol: DEBUG  # 只保留你自己的调试日志
+    org.springframework: INFO
+    org.hibernate: INFO
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  # 控制台日志格式
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  # 文件日志格式
@@ -246,28 +247,16 @@ spring:
       # 命令行运行 java -jar my_app.jar --spring.profiles.active=dev
       # 或者在IDE中设置环境变量 SPRING_PROFILES_ACTIVE=dev
       # 命令行运行 java -jar my_app.jar --spring.profiles.active=dev
-  # 开发环境数据源配置
-  datasource:
-    url: jdbc:postgresql://localhost:5432/cloudcontrol_test  # 开发环境数据库
-    username: postgres
-    password: bupt_test
-  
-  # 开发环境日志配置
-  logging:
-    level:
-      root: INFO  # 根日志级别
-      com.cloudcontrol: DEBUG  # 应用日志级别
-      org.springframework.web: DEBUG  # Web日志级别
-  
-  # 开发环境安全配置
-  security:
-    user:
-      name: dev  # 开发环境用户名
-      password: dev123  # 开发环境密码
-  
-  # 开发环境Flyway配置
-  flyway:
-    clean-disabled: false  # 开发环境允许clean命令
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    root: INFO
+    com.cloudcontrol: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF
 
 # ==================== 生产环境特定配置 ====================
 ---

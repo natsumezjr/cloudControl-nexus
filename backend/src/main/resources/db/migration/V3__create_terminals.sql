@@ -4,7 +4,7 @@
 
 CREATE TABLE terminals (
     serial_no INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- 设备序列号，自增主键
-    device_name VARCHAR(255) NOT NULL, -- 设备名称（注册时必填）
+    device_name VARCHAR(255) NOT NULL UNIQUE, -- 设备名称唯一
     password VARCHAR(255) NOT NULL, -- 终端账号密码
     account_name VARCHAR(255), -- 终端账号名称
     led_description VARCHAR(255), -- 设备描述

@@ -10,11 +10,11 @@ public class Terminal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("serialNo")
-    private int serialNo; // 设备序列号（自增主键）
+    private Integer serialNo; // 设备序列号（自增主键）
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @JsonProperty("deviceName")
-    private String deviceName; // 设备名称（注册时必填）
+    private String deviceName; // 设备名称（注册时必填，唯一）
 
     @Column(nullable = false)
     private String password; // 终端账号密码
@@ -43,10 +43,10 @@ public class Terminal {
     private String rotateProgramVsnsReport; // 轮播节目名上报开关
     @Column(columnDefinition = "TEXT")
     private String extra; // 预留扩展字段
-
+    
     // getter and setter
-    public int getSerialNo() { return serialNo; }
-    public void setSerialNo(int serialNo) { this.serialNo = serialNo; }
+    public Integer getSerialNo() { return serialNo; }
+    public void setSerialNo(Integer serialNo) { this.serialNo = serialNo; }
     public String getDeviceName() { return deviceName; }
     public void setDeviceName(String deviceName) { this.deviceName = deviceName; }
     public String getPassword() { return password; }

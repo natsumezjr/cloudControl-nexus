@@ -43,7 +43,7 @@ public class UserRegisterRequest {
      * 用户绑定到的终端组ID - 必填
      */
     @NotNull(message = "终端组ID不能为空")
-    private Long termId;
+    private Integer termId;
     
     /**
      * 注册用户的角色列表 - 必填
@@ -61,7 +61,7 @@ public class UserRegisterRequest {
     public UserRegisterRequest() {}
     
     public UserRegisterRequest(String email, String username, String password, String nickname, 
-                             Long termId, List<String> roles, Long assignedSize) {
+                             Integer termId, List<String> roles, Long assignedSize) {
         this.email = email;
         this.username = username;
         this.password = password;
@@ -104,11 +104,11 @@ public class UserRegisterRequest {
         this.nickname = nickname;
     }
     
-    public Long getTermId() {
+    public Integer getTermId() {
         return termId;
     }
     
-    public void setTermId(Long termId) {
+    public void setTermId(Integer termId) {
         this.termId = termId;
     }
     

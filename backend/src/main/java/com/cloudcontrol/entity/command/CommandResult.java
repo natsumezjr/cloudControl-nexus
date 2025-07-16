@@ -15,7 +15,7 @@ public class CommandResult {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     
     /**
      * 关联的指令ID - 外键关联
@@ -88,11 +88,10 @@ public class CommandResult {
     }
     
     // Getter和Setter方法
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
-    
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
     

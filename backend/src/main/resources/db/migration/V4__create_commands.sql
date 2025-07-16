@@ -1,6 +1,6 @@
 -- 创建 commands 表，字段与 Command 实体严格一致
 CREATE TABLE commands (
-    id BIGSERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     terminal_id INTEGER NOT NULL,
     cmd_num INTEGER NOT NULL, -- 对应 CommandType 枚举的编号
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

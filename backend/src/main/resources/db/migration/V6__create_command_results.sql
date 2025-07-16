@@ -3,8 +3,8 @@
 -- 描述: 创建指令结果表，与CommandResult实体类完全匹配
 
 CREATE TABLE command_results (
-    id BIGSERIAL PRIMARY KEY,                           -- 结果ID，自增主键
-    command_id BIGINT NOT NULL,                         -- 关联的指令ID，外键关联commands表
+    id SERIAL PRIMARY KEY,                              -- 结果ID，自增主键，类型为integer
+    command_id INTEGER NOT NULL,                        -- 关联的指令ID，外键关联commands表
     exit_code INTEGER,                                  -- 退出码
     stdout TEXT,                                        -- 标准输出
     stderr TEXT,                                        -- 标准错误输出

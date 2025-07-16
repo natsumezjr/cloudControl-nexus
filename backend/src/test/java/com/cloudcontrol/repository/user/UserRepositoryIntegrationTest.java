@@ -61,7 +61,7 @@ public class UserRepositoryIntegrationTest {
         dto.setEmail("integration@example.com");
         dto.setPassword("integrationPass");
         dto.setNickname("集成测试用户");
-        dto.setTermId(100L);
+        dto.setTermId(100);
         dto.setAssignedSize(1024L);
         dto.setRoles(Collections.singletonList("MANAGER"));
 
@@ -79,7 +79,7 @@ public class UserRepositoryIntegrationTest {
         assertThat(foundUser.getRole()).isEqualTo(UserRole.MANAGER);
         assertThat(foundUser.getStatus()).isEqualTo(UserStatus.ACTIVE);
         assertThat(foundUser.getNickname()).isEqualTo("集成测试用户");
-        assertThat(foundUser.getTermId()).isEqualTo(100L);
+        assertThat(foundUser.getTermId()).isEqualTo(100);
         assertThat(foundUser.getAssignedSize()).isEqualTo(1024L);
 
         // 5. 修改状态并保存

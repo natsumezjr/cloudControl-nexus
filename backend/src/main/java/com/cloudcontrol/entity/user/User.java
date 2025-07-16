@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @NotBlank(message = "用户名不能为空")
     private String username;
@@ -57,7 +57,7 @@ public class User{
      * 用户绑定的终端组ID
      */
     @Column(name = "term_id")
-    private Long termId;
+    private Integer termId;
 
     /**
      * 用户分配的空间大小（字节）
@@ -76,11 +76,11 @@ public class User{
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -156,11 +156,11 @@ public class User{
         this.nickname = nickname;
     }
 
-    public Long getTermId() {
+    public Integer getTermId() {
         return termId;
     }
 
-    public void setTermId(Long termId) {
+    public void setTermId(Integer termId) {
         this.termId = termId;
     }
 

@@ -1,0 +1,8 @@
+{
+  "password": "bupt",
+  "url": "string",
+  "internet": true,
+  "name": "bupt",
+  "devicestatus": "sleep",
+  "deviceName": "CLCA40252131"
+}

@@ -22,18 +22,24 @@ public class AuthTerminalServiceImpl implements TerminalAuthService {
     @Override
     public TerminalLoginResponse login(TerminalLoginRequest request) {
         try {
+            // 移除jsessionId相关处理、JsessionIdParser、setJsessionId等逻辑
             Optional<Terminal> optionalTerminal = terminalRepository.findByAccountNameAndPassword(
                 request.getAccountName(), 
                 request.getPassword()
             );
+            
             TerminalLoginResponse response = new TerminalLoginResponse();
             response.setAccountName(request.getAccountName());
             response.setPassword(request.getPassword());
             response.setUrl(request.getUrl());
             response.setStatus(request.getStatus());
             response.setInternet(request.isInternet());
+            
             if (optionalTerminal.isPresent()) {
                 response.setLogin(true);
+                Terminal terminal = optionalTerminal.get();
+                terminalRepository.save(terminal);
+                // 已移除JSESSIONID相关日志
             } else {
                 response.setLogin(false);
             }

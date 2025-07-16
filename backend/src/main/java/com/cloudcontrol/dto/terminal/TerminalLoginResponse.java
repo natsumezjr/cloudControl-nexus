@@ -16,6 +16,7 @@ public class TerminalLoginResponse {
     private String status;      // 终端状态（如 sleep）
     private boolean internet;   // 是否联网
     private boolean login;      // 登录是否成功
+    private String jsessionId;  // JSESSIONID 会话标识符
 
     // Getters and Setters
     public String getAccountName() { return accountName; }
@@ -35,4 +36,7 @@ public class TerminalLoginResponse {
     
     public boolean isLogin() { return login; }
     public void setLogin(boolean login) { this.login = login; }
+    
+    public String getJsessionId() { return jsessionId; }
+    public void setJsessionId(String jsessionId) { this.jsessionId = jsessionId; }
 } 

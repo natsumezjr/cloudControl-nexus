@@ -1,14 +1,22 @@
+// backend/src/main/java/com/cloudcontrol/dto/command/Bck2TmnlCommandGetResponse.java
+
 package com.cloudcontrol.dto.command;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Bck2TmnlCommandGetResponse implements CommandResponse {
+
+    @JsonProperty("root")
+    private List<Bck2TmnlCommandGetResponse> root = new ArrayList<>();
+
     @JsonProperty("id")
-    private Long id;
+    private Integer id;
 
     @JsonProperty("post")
-    private Long terminalId;
+    private Integer terminalId;
 
     @JsonProperty("author_url")
     private String authorUrl;
@@ -22,12 +30,18 @@ public class Bck2TmnlCommandGetResponse implements CommandResponse {
     @JsonProperty("created_at")
     private Timestamp createdAt;
 
-    // getter/setter
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Bck2TmnlCommandGetResponse() {}
 
-    public Long getTerminalId() { return terminalId; }
-    public void setTerminalId(Long terminalId) { this.terminalId = terminalId; }
+    // root相关
+    public List<Bck2TmnlCommandGetResponse> getRoot() { return root; }
+    public void setRoot(List<Bck2TmnlCommandGetResponse> root) { this.root = root; }
+    public void addToRoot(Bck2TmnlCommandGetResponse item) { this.root.add(item); }
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+    public Integer getTerminalId() { return terminalId; }
+    public void setTerminalId(Integer terminalId) { this.terminalId = terminalId; }
 
     public String getAuthorUrl() { return authorUrl; }
     public void setAuthorUrl(String authorUrl) { this.authorUrl = authorUrl; }
@@ -44,8 +58,7 @@ public class Bck2TmnlCommandGetResponse implements CommandResponse {
     public static class Content {
         @JsonProperty("raw")
         private String raw;
-
         public String getRaw() { return raw; }
         public void setRaw(String raw) { this.raw = raw; }
     }
-} 
+}
