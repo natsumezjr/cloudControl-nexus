@@ -162,6 +162,21 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- ==================== 文件上传层 ==================== -->
+        <!-- Tus断点续传支持 -->
+        <dependency>
+            <groupId>io.tus.java.client</groupId>
+            <artifactId>tus-java-client</artifactId>
+            <version>0.4.3</version>
+        </dependency>
+        
+        <!-- Apache Commons Codec - MD5计算 -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
+        
     </dependencies>
     
     <!-- ==================== 构建配置 ==================== -->
@@ -223,7 +238,7 @@
             <id>dev</id>
             <properties>
                 <flyway.cleanDisabled>false</flyway.cleanDisabled>
-                <flyway.url>jdbc:postgresql://localhost:5432/cloudcontrol_dev</flyway.url>
+                <flyway.url>jdbc:postgresql://localhost:5432/cloudcontrol_test</flyway.url>
                 <flyway.user>postgres</flyway.user>
                 <flyway.password>bupt_test</flyway.password>
             </properties>

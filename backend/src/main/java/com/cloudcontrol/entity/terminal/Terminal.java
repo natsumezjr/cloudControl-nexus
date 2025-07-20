@@ -21,6 +21,13 @@ public class Terminal {
 
     @JsonProperty("accountName")
     private String accountName; // 终端账号名称
+    
+    /**
+     * 所属终端组
+     */
+    @ManyToOne
+    @JoinColumn(name = "terminal_group_id")
+    private TerminalGroup terminalGroup;
     private String ledDescription; // 设备描述
     private Timestamp lastHeartbeat; // 最后心跳/消息时间
     private String status; // 终端状态（如online/sleep/rebooting）
@@ -44,6 +51,13 @@ public class Terminal {
     @Column(columnDefinition = "TEXT")
     private String extra; // 预留扩展字段
     
+    @Column(name = "created_at")
+    private Timestamp createdAt; // 创建时间
+    
+    // GPS坐标字段
+    private Float lat; // 纬度
+    private Float lng; // 经度
+    
     // getter and setter
     public Integer getSerialNo() { return serialNo; }
     public void setSerialNo(Integer serialNo) { this.serialNo = serialNo; }
@@ -53,6 +67,10 @@ public class Terminal {
     public void setPassword(String password) { this.password = password; }
     public String getAccountName() { return accountName; }
     public void setAccountName(String accountName) { this.accountName = accountName; }
+    
+    public TerminalGroup getTerminalGroup() { return terminalGroup; }
+    public void setTerminalGroup(TerminalGroup terminalGroup) { this.terminalGroup = terminalGroup; }
+    
     public String getLedDescription() { return ledDescription; }
     public void setLedDescription(String ledDescription) { this.ledDescription = ledDescription; }
     public Timestamp getLastHeartbeat() { return lastHeartbeat; }
@@ -95,4 +113,13 @@ public class Terminal {
     public void setRotateProgramVsnsReport(String rotateProgramVsnsReport) { this.rotateProgramVsnsReport = rotateProgramVsnsReport; }
     public String getExtra() { return extra; }
     public void setExtra(String extra) { this.extra = extra; }
+    
+    public Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    
+    public Float getLat() { return lat; }
+    public void setLat(Float lat) { this.lat = lat; }
+    
+    public Float getLng() { return lng; }
+    public void setLng(Float lng) { this.lng = lng; }
 }
