@@ -179,34 +179,88 @@ Repository → Service → Controller
 - **Service**: ⏳ 待开发
 - **Controller**: ⏳ 待开发
 
-#### 其他模块 ⏳
-- **Terminal**: Entity和SQL已完成，DTO和Repository待开发
-- **TerminalGroup**: Entity和SQL已完成，DTO和Repository待开发
-- **Command**: Entity和SQL已完成，DTO和Repository待开发
+#### Program模块 ✅
+- **Entity**: ✅ 已完成 (Program.java)
+- **SQL**: ✅ 已完成 (V9__create_programs.sql, V15__add_missing_program_fields.sql)
+- **DTO**: ✅ 已完成 (ProgramCreateRequest, ProgramResponse, ProgramListResponse等)
+- **Repository**: ✅ 已完成 (ProgramRepository.java)
+- **Service**: ✅ 已完成 (ProgramService.java, SimplifyCreateProgramService.java)
+- **Controller**: ✅ 已完成 (ProgramController.java, ProgramInfoController.java)
+
+#### Media模块 ✅
+- **Entity**: ✅ 已完成 (Media.java)
+- **SQL**: ✅ 已完成 (V10__create_media.sql)
+- **DTO**: ✅ 已完成 (MediaUploadResponse, MediaDeleteResponse, MediaInfo等)
+- **Repository**: ✅ 已完成 (MediaRepository.java)
+- **Service**: ✅ 已完成 (MediaService.java)
+- **Controller**: ✅ 已完成 (MediaController.java)
+
+#### Schedule模块 ✅
+- **Entity**: ✅ 已完成 (相关实体类)
+- **SQL**: ✅ 已完成 (相关迁移脚本)
+- **DTO**: ✅ 已完成 (UpdateTerminalScheduleRequest, TerminalScheduleResponse等)
+- **Repository**: ✅ 已完成 (相关Repository接口)
+- **Service**: ✅ 已完成 (TerminalScheduleService.java, TerminalGroupScheduleService.java)
+- **Controller**: ✅ 已完成 (ScheduleController.java, TerminalGroupScheduleController.java)
+
+#### Terminal模块 ✅
+- **Entity**: ✅ 已完成 (Terminal.java, TerminalGroup.java等)
+- **SQL**: ✅ 已完成 (V2__create_terminal_groups.sql, V3__create_terminals.sql, V14__add_missing_terminal_fields.sql)
+- **DTO**: ✅ 已完成 (TerminalCreateRequest, TerminalResponse等)
+- **Repository**: ✅ 已完成 (TerminalRepository.java, TerminalGroupRepository.java)
+- **Service**: ✅ 已完成 (TerminalService.java, TerminalTagService.java)
+- **Controller**: ✅ 已完成 (TerminalController.java, TerminalTagController.java)
+
+#### Command模块 ✅
+- **Entity**: ✅ 已完成 (Command.java, CommandResult.java)
+- **SQL**: ✅ 已完成 (V4__create_commands.sql, V6__create_command_results.sql)
+- **DTO**: ✅ 已完成 (CommandRequest, CommandResponse等)
+- **Repository**: ✅ 已完成 (CommandRepository.java, CommandResultRepository.java)
+- **Service**: ✅ 已完成 (FtdBckCommandService.java, TmnlBckGetCommandService.java)
+- **Controller**: ✅ 已完成 (FtdBckCommandController.java, TmnlBckCommandController.java)
+
+#### TUS模块 ✅
+- **Entity**: ✅ 已完成 (TusUpload.java)
+- **SQL**: ✅ 已完成 (V8__create_tus_upload.sql)
+- **DTO**: ✅ 已完成 (TusUploadResponse等)
+- **Repository**: ✅ 已完成 (TusUploadRepository.java)
+- **Service**: ✅ 已完成 (TusService.java)
+- **Controller**: ✅ 已完成 (TusController.java)
 
 ### 下一步计划
 
 #### 短期目标 (1-2周)
-1. **完成User模块Service层**
-   - 实现用户注册服务
-   - 实现用户登录服务
-   - 实现用户管理服务
+1. **完善现有模块**
+   - 补充单元测试
+   - 完善API文档
+   - 优化错误处理
 
-2. **开始Terminal模块开发**
-   - 完成DTO设计
-   - 完成Repository接口
-   - 开始Service层开发
+2. **系统集成测试**
+   - 模块间集成测试
+   - 端到端功能测试
+   - 性能压力测试
 
 #### 中期目标 (1个月)
-1. **完成所有基础模块**
-   - Terminal模块完整开发
-   - TerminalGroup模块完整开发
-   - Command模块完整开发
+1. **功能完善**
+   - 用户权限系统
+   - 日志记录系统
+   - 监控告警系统
 
-2. **完善测试体系**
-   - 提高测试覆盖率
-   - 完善集成测试
-   - 建立自动化测试
+2. **性能优化**
+   - 数据库查询优化
+   - 缓存机制实现
+   - 并发处理优化
+
+#### 长期目标 (2-3个月)
+1. **系统集成**
+   - 模块间集成测试
+   - 性能优化
+   - 安全加固
+
+2. **生产部署**
+   - 部署环境准备
+   - 监控告警配置
+   - 运维文档完善
 
 ## 文档维护规范
 
