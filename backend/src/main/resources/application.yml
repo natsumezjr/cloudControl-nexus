@@ -24,7 +24,7 @@ spring:
     # PostgreSQL数据库配置
     url: jdbc:postgresql://localhost:5432/cloudcontrol_test  # 数据库连接URL
     # URL格式: jdbc:postgresql://主机:端口/数据库名，需要提前创建数据库。
-    # localhost=数据库服务器地址, 5432=PostgreSQL端口, cloudcontrol_dev=数据库名
+    # localhost=数据库服务器地址, 5432=PostgreSQL端口, cloudcontrol_test=数据库名
     username: postgres  # 数据库用户名，是数据库的超级用户
     password: bupt_test  # 数据库密码，通常是下载数据库时设置的密码
     driver-class-name: org.postgresql.Driver  # PostgreSQL驱动类

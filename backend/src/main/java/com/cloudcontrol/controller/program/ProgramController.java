@@ -23,7 +23,7 @@ import java.util.List;
  * 节目控制器
  */
 @RestController
-@RequestMapping("/wp-json/wp/v2")
+//@RequestMapping("/wp-json/wp/v2")
 public class ProgramController {
     
     private static final Logger logger = LoggerFactory.getLogger(ProgramController.class);
@@ -45,7 +45,7 @@ public class ProgramController {
         logger.info("收到创建节目请求: title={}", request.getTitle());
         
         try {
-            if (request == null) {
+            if (request == null || request.getTitle() == null) {
                 return ResponseEntity.badRequest().body(null);
             }
             
@@ -243,7 +243,7 @@ public class ProgramController {
                    request.getProgramId(), request.getVsnMd5(), request.getTerminalIds());
         
         try {
-            if (request == null) {
+            if (request == null || request.getProgramId() == null) {
                 return ResponseEntity.badRequest().body(new ProgramUnpublishErrorResponse(
                     400, "Request body cannot be null", null));
             }

@@ -6,7 +6,8 @@ import com.cloudcontrol.dto.terminal.TerminalRegisterRequest;
 import com.cloudcontrol.dto.terminal.TerminalRegisterResponse;
 import com.cloudcontrol.entity.terminal.Terminal;
 import com.cloudcontrol.repository.terminal.TerminalRepository;
-import com.cloudcontrol.service.terminal.TerminalAuthService;
+import com.cloudcontrol.service.auth.TerminalAuthService;
+
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
@@ -71,5 +72,10 @@ public class AuthTerminalServiceImpl implements TerminalAuthService {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    @Override
+    public Optional<Terminal> authenticateTerminal(String username, String password) {
+        return terminalRepository.findByAccountNameAndPassword(username, password);
     }
 }

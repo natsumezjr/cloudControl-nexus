@@ -24,4 +24,5 @@ public interface CommandRepository extends JpaRepository<Command, Integer> {
     void deleteByTerminalId(Integer terminalId);
     // 按指令ID删除指令
     void deleteById(Integer id);
+
 } 

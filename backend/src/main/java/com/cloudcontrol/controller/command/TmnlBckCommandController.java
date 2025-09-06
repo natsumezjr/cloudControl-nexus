@@ -13,7 +13,10 @@ import com.cloudcontrol.dto.command.Tmnl2BckCommandGetRequest;
 import com.cloudcontrol.serviceImpl.command.TmnlBckPostCommandService;
 import com.cloudcontrol.dto.command.Bck2TmnlCommandPostResponse;
 import com.cloudcontrol.dto.command.Tmnl2BckCommandPostRequest;
+import com.cloudcontrol.dto.common.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import java.util.Enumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +36,18 @@ public class TmnlBckCommandController {
     private static final Logger logger = LoggerFactory.getLogger(TmnlBckCommandController.class);
 
     @GetMapping("")
-    public List<Bck2TmnlCommandGetResponse> getCommand(
+    public ResponseEntity<?> getCommand(
         @RequestParam("clt_type") String cltType,
         @RequestParam("device_num") String deviceNum,
         @RequestHeader(value = "Cookie", required = false) String cookie,
         HttpServletRequest request) {
+        
+        // 获取认证的终端信息（拦截器已处理认证）
+        String terminalDeviceName = (String) request.getAttribute("terminalDeviceName");
+        String terminalAccountName = (String) request.getAttribute("terminalAccountName");
+        
+        logger.info("认证终端信息: 设备名={}, 账号名={}", terminalDeviceName, terminalAccountName);
+        
         // 打印请求URL
         logger.info("请求URL: {}", request.getRequestURL() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
         // 打印所有请求头
@@ -46,28 +56,36 @@ public class TmnlBckCommandController {
             String name = headerNames.nextElement();
             logger.info("Header: {} = {}", name, request.getHeader(name));
         }
-        // 打印请求体（GET一般没有，但为调试完整性保留）
-        // 如果需要POST体内容，可在POST方法中加
         // 打印收到的Cookie头，便于调试
         logger.info("Cookie Header: {}", cookie);
-        // 移除jsessionId相关处理和日志
+        
         // 构造驼峰风格DTO
         Tmnl2BckCommandGetRequest req = new Tmnl2BckCommandGetRequest();
         req.setCltType(cltType);
         req.setDeviceNum(deviceNum);
-        return tmnlBckGetCommandService.handleCommand(req);
+        List<Bck2TmnlCommandGetResponse> result = tmnlBckGetCommandService.handleCommand(req);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("")
-    public Bck2TmnlCommandPostResponse postCommand(@RequestBody Tmnl2BckCommandPostRequest commandRequest) {
+    public ResponseEntity<?> postCommand(
+        @RequestBody Tmnl2BckCommandPostRequest commandRequest,
+        HttpServletRequest request) {
+        
+        // 获取认证的终端信息（拦截器已处理认证）
+        String terminalDeviceName = (String) request.getAttribute("terminalDeviceName");
+        String terminalAccountName = (String) request.getAttribute("terminalAccountName");
+        
+        logger.info("认证终端信息: 设备名={}, 账号名={}", terminalDeviceName, terminalAccountName);
+        
         try {
-            System.out.println("收到POST请求: parent=" + commandRequest.getCommandId() + ", content=" + commandRequest.getContent());
-            return tmnlBckPostCommandService.handleCommand(commandRequest);
+            logger.info("收到POST请求: parent=" + commandRequest.getCommandId() + ", content=" + commandRequest.getContent());
+            Bck2TmnlCommandPostResponse result = tmnlBckPostCommandService.handleCommand(commandRequest);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            System.out.println("postCommand异常: " + e.getMessage());
-            e.printStackTrace();
-            // 500响应
-            return new Bck2TmnlCommandPostResponse(null, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("postCommand异常: " + e.getMessage(), e);
+            // 让全局异常处理器处理
+            throw new RuntimeException("处理POST请求时发生异常", e);
         }
     }
 

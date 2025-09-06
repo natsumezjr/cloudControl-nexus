@@ -3,7 +3,8 @@ package com.cloudcontrol.controller.auth;
 import com.cloudcontrol.dto.terminal.TerminalLoginRequest;
 import com.cloudcontrol.dto.terminal.TerminalRegisterRequest;
 import com.cloudcontrol.dto.terminal.TerminalRegisterResponse;
-import com.cloudcontrol.service.terminal.TerminalAuthService;
+import com.cloudcontrol.service.auth.TerminalAuthService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
