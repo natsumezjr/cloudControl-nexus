@@ -4,6 +4,7 @@ import com.cloudcontrol.entity.terminal.Terminal;
 import com.cloudcontrol.exception.TerminalAuthenticationException;
 import com.cloudcontrol.service.auth.TerminalAuthService;
 import com.cloudcontrol.util.TmnlHttpBasicAuthUtil;
+import com.cloudcontrol.util.RequestContextUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
@@ -53,12 +54,11 @@ public class TerminalAuthInterceptor implements HandlerInterceptor {
             Optional<Terminal> terminalOpt = terminalAuthService.authenticateTerminal(username, password);
             
             if (terminalOpt.isPresent()) {
-                // 认证成功，将终端信息存储到请求属性中
+                // 认证成功，将终端信息存储到请求属性和请求上下文中
                 System.out.println("Interceptor：认证成功");
                 Terminal terminal = terminalOpt.get();
-                request.setAttribute("authenticatedTerminal", terminal);
-                request.setAttribute("terminalDeviceName", terminal.getDeviceName());
-                request.setAttribute("terminalAccountName", terminal.getAccountName());
+                // 同时存储到请求上下文中，供服务层使用
+                RequestContextUtil.setAuthenticatedTerminal(terminal);
                 
                 System.out.println("终端认证成功: " + terminal.getDeviceName() + " (" + terminal.getAccountName() + ")");
                 return true;

@@ -54,19 +54,33 @@ public class AuthTerminalServiceImpl implements TerminalAuthService {
     @Override
     public TerminalRegisterResponse register(TerminalRegisterRequest request) {
         try {
+            String accountName = request.getAccountName();
+            String password = request.getPassword();
+            String deviceName = request.getDeviceName();
+            String status = request.getStatus();
+            boolean internet = request.isInternet();
+            String url = request.getUrl();
+
+
+            // 调试日志
+            if (terminalRepository.findByDeviceName(deviceName).isPresent() || terminalRepository.findByAccountNameAndPassword(accountName, password).isPresent()) {
+                throw new RuntimeException("终端已存在，请勿重复注册");
+            }
+
             Terminal terminal = new Terminal();
-            terminal.setAccountName(request.getAccountName());
-            terminal.setPassword(request.getPassword());
-            terminal.setDeviceName(request.getDeviceName()); // 设置设备名称（必填）
-            terminal.setStatus(request.getStatus()); // 设置状态
+            terminal.setAccountName(accountName);
+            terminal.setPassword(password);
+            terminal.setDeviceName(deviceName); // 设置设备名称（必填）
+            terminal.setStatus(status); // 设置状态
             terminalRepository.save(terminal);
             TerminalRegisterResponse response = new TerminalRegisterResponse();
-            response.setAccountName(request.getAccountName());
-            response.setPassword(request.getPassword());
-            response.setUrl(request.getUrl());
-            response.setStatus(request.getStatus());
-            response.setInternet(request.isInternet());
+            response.setAccountName(accountName);
+            response.setPassword(password);
+            response.setUrl(url);
+            response.setStatus(status);
+            response.setInternet(internet);
             response.setSuccess(true);
+            response.setSerialNo(terminal.getSerialNo());
             return response;
         } catch (Exception e) {
             e.printStackTrace();

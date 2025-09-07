@@ -16,6 +16,8 @@ public class TerminalRegisterResponse {
     private String status;      // 终端状态（如 sleep）
     private boolean internet;   // 是否联网
     private boolean success;    // 注册是否成功
+    @JsonProperty("terminalId")
+    private Integer serialNo;   // 设备序列号
 
     // Getters and Setters
     public String getAccountName() { return accountName; }
@@ -35,4 +37,7 @@ public class TerminalRegisterResponse {
     
     public boolean isSuccess() { return success; }
     public void setSuccess(boolean success) { this.success = success; }
+
+    public Integer getSerialNo() { return serialNo; }
+    public void setSerialNo(Integer serialNo) { this.serialNo = serialNo; }
 } 

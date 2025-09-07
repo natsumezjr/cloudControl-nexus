@@ -9,6 +9,7 @@ import com.cloudcontrol.service.command.TmnlBckGetCommandService;
 import com.cloudcontrol.entity.command.Command;
 import com.cloudcontrol.entity.terminal.Terminal;
 import com.cloudcontrol.repository.terminal.TerminalRepository;
+import com.cloudcontrol.util.RequestContextUtil;
 import java.util.List;
 import java.util.Optional;
 import com.cloudcontrol.enums.command.CommandType;
@@ -44,8 +45,22 @@ public class TmnlBckGetCommandServiceImpl implements TmnlBckGetCommandService<Tm
                 System.out.println("通过 deviceNum 查找终端: " + deviceNum);
             }
             if (terminalOpt == null || !terminalOpt.isPresent()) {
-                System.out.println("通过 deviceNum 未找到终端，返回空数组");
-                return resultList;
+                System.out.println("通过 deviceNum 未找到终端，尝试使用认证信息查找");
+                
+                // 尝试从请求上下文中获取已认证的终端信息
+                Optional<Terminal> authenticatedTerminalOpt = RequestContextUtil.getAuthenticatedTerminal();
+                if (authenticatedTerminalOpt.isPresent()) {
+                    // 直接修改并保存原终端的设备名称
+                    Terminal originalTerminal = authenticatedTerminalOpt.get();
+                    originalTerminal.setDeviceName(deviceNum);
+                    terminalRepository.save(originalTerminal);
+                    terminalOpt = Optional.of(originalTerminal);
+                    System.out.println("使用认证信息找到终端账号: " + authenticatedTerminalOpt.get().getAccountName() + 
+                                     "，更新设备名称为: " + deviceNum);
+                } else {
+                    System.out.println("请求上下文中也没有认证终端信息，返回空数组");
+                    return resultList;
+                }
             }
             Terminal terminal = terminalOpt.get();
             System.out.println("找到终端: " + terminal.getSerialNo());

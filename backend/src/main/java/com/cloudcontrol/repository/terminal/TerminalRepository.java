@@ -13,4 +13,5 @@ public interface TerminalRepository extends JpaRepository<Terminal, Integer> {
     Optional<Terminal> findByDeviceName(String deviceName);
     Optional<Terminal> findByAccountNameAndPassword(String accountName, String password);
     List<Terminal> findByTerminalGroupId(Integer terminalGroupId);
+    
 } 

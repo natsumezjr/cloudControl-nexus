@@ -1,7 +1,5 @@
 package com.cloudcontrol.dto.command;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * 设备获取指令接口请求参数DTO
  * 注意：为兼容接口参数风格，字段名采用下划线命名，违反Java驼峰规范
